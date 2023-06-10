@@ -2,8 +2,8 @@
 
 class ISIS:
     def __init__(self, name, age):
-        self.inshalla = name
-        self.harem = age
+        self.name = name
+        self.age = age
 
 
     def add_one(self, x):
@@ -11,13 +11,14 @@ class ISIS:
         return 1 + x
     
     def get_name(self):
-        return self.inshalla
+        return self.name
     
     def get_age(self):
-        return self.harem
+        return self.age
     
     def set_age(self, age):
-        self.harem = age
+        self.age = age
+        
         
         
 
@@ -28,8 +29,62 @@ class ISIS:
 A = ISIS("Joe", 51)
 B = ISIS("Harem", 49)
 
-print(A.harem)
-
 A.set_age(100)
 
-print(A.harem)
+
+
+class Student:
+    def __init__(self, name, age, grade):
+        self.name = name
+        self.age = age
+        self.grade = grade # 0 - 100
+        print("Created " + str(self.name))
+
+        
+    def get_grade(self):
+        return self.grade
+
+
+
+
+class Course:
+    def __init__(self, name, max_students):
+        self.name = name
+        self.max_students = max_students
+        self.students = []
+
+    def add_student(self, student):
+        if len(self.students) < self.max_students:
+            self.students.append(student)
+            return True
+        return False
+
+    def get_students(self):
+        return [self.students[i].name for i in range(len(self.students))]
+    
+    def get_avg_grade(self):
+        return sum([self.students[i].grade for i in range(len(self.students))]) / len(self.students)
+    
+
+    
+
+
+
+
+John = Student("John", 12, 87)
+Sera = Student("Sera", 12, 89)
+James = Student("James", 12, 98)
+
+Math = Course("Math1B", 3)
+
+Math.add_student(John)
+Math.add_student(Sera)
+Math.add_student(James)
+
+
+print(Math.students)
+print(Math.get_students())
+print(Math.get_avg_grade())
+
+
+
