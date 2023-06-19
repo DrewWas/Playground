@@ -63,12 +63,10 @@ class Course:
         return [self.students[i].name for i in range(len(self.students))]
     
     def get_avg_grade(self):
-        return sum([self.students[i].grade for i in range(len(self.students))]) / len(self.students)
+        return sum([self.students[i].get_grade() for i in range(len(self.students))]) / len(self.students)
     
 
     
-
-
 
 
 John = Student("John", 12, 87)
@@ -82,9 +80,61 @@ Math.add_student(Sera)
 Math.add_student(James)
 
 
-print(Math.students)
-print(Math.get_students())
-print(Math.get_avg_grade())
+
+
+
+
+class Cat:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+        self.hungry = True
+        print("created")
+
+    def speak(self):
+        print("Meow")
+
+    def eat(self):
+        self.hungry = False
+
+    def is_hungry(self):
+        return self.hungry
+
+"""
+class Dog:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+        self.hungry = True
+
+    def speak(self):
+        print("Bark")
+
+    def eat(self):
+        self.hungry = False
+
+    def is_hungry(self):
+        return self.hungry
+"""
+
+class Dog(Cat):
+    def speak(self):
+        print("Bark")
+
+Buster = Dog("Buster", 1)
+Earl = Cat("Earl", 13)
+
+Buster.eat()
+Earl.speak()
+Buster.speak()
+print(Buster.is_hungry())
+
+
+
+
+
+
+
 
 
 
