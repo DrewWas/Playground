@@ -19,9 +19,6 @@ class ISIS:
     def set_age(self, age):
         self.age = age
         
-        
-        
-
     def bark(self):
         print("bark")
 
