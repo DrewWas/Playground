@@ -9,18 +9,18 @@ pygame.display.set_caption("Game of Life")
 
 
 # GRID 
-GRID = [[i for i in range(50)] for j in range(50)]
+GRID = [[i for i in range(25)] for j in range(25)]
 
 
 def draw():
     for i in GRID:
-        for j in GRID:
-            pygame.draw.line(WIN, (255,255,255), (0,0), (800, 800))
+        for j in i:
+            pygame.draw.line(WIN, (255,255,255), (j * 32, 0), (j * 32, 800))
+            pygame.draw.line(WIN, (255,255,255), (0, j * 32), (800, j * 32))
 
 
 
 def main():
-
     run = True
 
     while run:
