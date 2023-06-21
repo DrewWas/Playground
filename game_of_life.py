@@ -64,12 +64,29 @@ def setUp_blocks():
 # HOW DO WE ENSURE THAT BLOCKS CANNOT BE SELECTED AFTER THE EVOLVE FUNCTION HAS STARTED
 
 
-def get_neighbors():
-    return None
+def get_neighbors(square):
+    # ---- Implementation 1 -------
+    # All cells have 8 neighbors, but for cells on the edge, they're non-present neighbors are assumed
+    # to be dead 
+    neighbors = [square]
+
+    #neighbors = [ (3, 4, False), [(3,5,False), (3,3, True), (4,3, True), (5,3, False)] ]
+
+
+    # ---- Implementation 2 -------
+    # Or we can try to just make the grid larger (30x30) and still only show the 25x25 one and every
+    # time step just reset all cells outside 26x26 to be dead
+    # I feel like this one will be harder, but the other one might not actually work
 
 
 
 def evolve():
+    """
+    for i in selected_squares:
+        get_neighbors(i)
+    """    				# something like this 
+
+
     print(GRID)
     return None
     """
@@ -104,7 +121,6 @@ def main():
 
 
 main()
-
 
 
 
