@@ -20,7 +20,7 @@ GRID = [[i for i in range(25)] for j in range(25)]
 # NEED TO DO 1s/0s for GRID Linked List so that we can do evaluations for the actual game rules
 
 
-def draw():
+def draw_grid():
     for i in GRID:
         for j in i:
 
@@ -33,28 +33,35 @@ def draw():
 
 
 
+def update_blocks():
+    mouse_x,mouse_y = pygame.mouse.get_pos()
+
+    x_pos = mouse_x - (mouse_x % 32)
+    y_pos = mouse_y - (mouse_y % 32)
+
+    print((mouse_x,mouse_y), (x_pos, y_pos))
+    pygame.draw.rect(WIN, (0,138,255), pygame.Rect(x_pos, y_pos, 32, 32))
+
+
+
 def main():
     run = True
 
 
     while run:
-        mouse_x,mouse_y = pygame.mouse.get_pos()
+        #mouse_x,mouse_y = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
 
-                # Fix this 
+                #x_pos = mouse_x - (mouse_x % 32)
+                #y_pos = mouse_y - (mouse_y % 32)
+                update_blocks()
+                #print((mouse_x,mouse_y), (x_pos, y_pos))
+                #pygame.draw.rect(WIN, (0,138,255), pygame.Rect(x_pos, y_pos, 32, 32))
 
-                print("click")
-                x_pos = mouse_x - (mouse_x % 25)
-                y_pos = mouse_y - (mouse_y % 25)
-                pygame.draw.rect(WIN, (0,138,255), pygame.Rect(x_pos, y_pos, 32, 32))
-
-                print((mouse_x,mouse_y), (x_pos, y_pos))
-
-
-        draw()
+        draw_grid()
         
         pygame.display.update()
 
