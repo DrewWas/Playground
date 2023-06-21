@@ -12,10 +12,6 @@ pygame.display.set_caption("Game of Life")
 GRID = [[[i  * 32, False] for i in range(25)] for j in range(25)]
 
 
-# NEED TO GET POINTER (X,Y), IF CLICK DETECTED, SQUARE WITH THOSE COORDINATES ARE NOW COLORED
-
-# NEED TO DO 1s/0s for GRID Linked List so that we can do evaluations for the actual game rules
-
 
 def draw_grid():
     for i in GRID:
@@ -28,7 +24,6 @@ def draw_grid():
 def update_blocks():
 
     # False = Dead | True = Alive
-
 
     # get positions
     mouse_x,mouse_y = pygame.mouse.get_pos()
@@ -48,22 +43,13 @@ def update_blocks():
         GRID[y_pos // 32][x_pos // 32][1] = True 
 
 
-    print(GRID, cell_status)
 
 
-
-
-
-# If block is already blue, and clicked again, it goes back to black
 
 
 
 def main():
     run = True
-
-
-    #for i in GRID:  # delete
-     #   print(i)    # delete
 
 
     while run:
