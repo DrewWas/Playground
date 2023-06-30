@@ -1,4 +1,5 @@
 # Conways game of life
+# https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
 
 """
 HOW TO PLAY:
@@ -16,10 +17,11 @@ pygame.init()
 WIN = pygame.display.set_mode((800,800))
 pygame.display.set_caption("Game of Life")
 
-dimension = 25
+dimension = int(input("Select dimensions (ex 5 --> 5x5 grid):  "))
+square_size = 800 // dimension
 
 # GRID 
-GRID = [[[i  * 32, False] for i in range(dimension + 200)] for j in range(dimension + 200)]
+GRID = [[[i  * square_size, False] for i in range(dimension + 200)] for j in range(dimension + 200)]
 SELECTED_SQUARES = []
 
 
@@ -37,22 +39,22 @@ def setUp_blocks():
 
     # get positions
     mouse_x,mouse_y = pygame.mouse.get_pos()
-    x_pos = mouse_x - (mouse_x % 32)
-    y_pos = mouse_y - (mouse_y % 32)
+    x_pos = mouse_x - (mouse_x % square_size)
+    y_pos = mouse_y - (mouse_y % square_size)
 
-    cell_status = GRID[y_pos // 32][x_pos // 32][1]
+    cell_status = GRID[y_pos // square_size][x_pos // square_size][1]
 
     if cell_status:  
         #alive --> dead
-        pygame.draw.rect(WIN, (0, 0, 0), pygame.Rect(x_pos, y_pos, 32, 32))
-        GRID[y_pos // 32][x_pos // 32][1] = False
-        SELECTED_SQUARES.remove( (x_pos // 32, y_pos // 32) )
+        pygame.draw.rect(WIN, (0, 0, 0), pygame.Rect(x_pos, y_pos, square_size, square_size))
+        GRID[y_pos // square_size][x_pos // square_size][1] = False
+        SELECTED_SQUARES.remove( (x_pos // square_size, y_pos // square_size) )
 
     else:
         #dead --> alive
-        pygame.draw.rect(WIN, (0, 138, 255), pygame.Rect(x_pos, y_pos, 32, 32))
-        GRID[y_pos // 32][x_pos // 32][1] = True 
-        SELECTED_SQUARES.append( (x_pos // 32, y_pos // 32) )
+        pygame.draw.rect(WIN, (0, 138, 255), pygame.Rect(x_pos, y_pos, square_size, square_size))
+        GRID[y_pos // square_size][x_pos // square_size][1] = True 
+        SELECTED_SQUARES.append( (x_pos // square_size, y_pos // square_size) )
 
 
     print(SELECTED_SQUARES)
