@@ -64,7 +64,7 @@ def select_blocks():
         SELECTED_SQUARES.append( ( (x_pos // square_size) , (y_pos // square_size), True ) )
 
 
-    print(SELECTED_SQUARES)
+    #   print(SELECTED_SQUARES)
 
     return SELECTED_SQUARES 
 
@@ -77,8 +77,28 @@ def get_neighbors(square):
     # ---- Implementation 1 -------
     # All cells have 8 neighbors, but for cells on the edge, they're non-present neighbors are assumed
     # to be dead 
-    neighbors = [square,]
+    x_cord = square[0]
+    y_cord = square[1] 
+
+
+    #neighbors = [ square,    [(square[0] + 1, square[1], GRID[x_cord][y_cord][1])                ]  ]
+    neighbors = [square]
+
+    # fix edge cases
+
+    try:
+        for i in range(-1,2):
+            for j in range(-1,2):
+                if not (i == 0 and j == 0):
+                    neighbors.append( [x_cord + i, y_cord + j] )
+    except IndexError:
+        pass
+
+    #if not there, then dont append to list
+    # try ____ --> except ____
+
     print(neighbors)
+    # print(x_cord, y_cord)
 
     #neighbors = [ (3, 4, False), [(3,5,False), (3,3, True), (4,3, True), (5,3, False)] ]
 
