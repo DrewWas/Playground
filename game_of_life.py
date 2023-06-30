@@ -10,6 +10,10 @@ HOW TO PLAY:
 * To begin the simulation, press RETURN
 """
 
+#EXPAND THE GRID!!!!!
+#IMPLEMENT TIME STEP!!!
+
+
 import pygame
 
 # Set up
@@ -19,21 +23,22 @@ pygame.display.set_caption("Game of Life")
 
 dimension = int(input("Select dimensions (ex 5 --> 5x5 grid):  "))
 square_size = 800 // dimension
+extra_squares = dimension if dimension <= 50 else 50
 
 # GRID 
-GRID = [[[i  * square_size, False] for i in range(dimension + 200)] for j in range(dimension + 200)]
+GRID = [[[(i  * square_size), False] for i in range(dimension + extra_squares)] for j in range(dimension + extra_squares)]
 SELECTED_SQUARES = []
 
 
 def draw_grid():
     for i in GRID:
         for j in i:
-            pygame.draw.line(WIN, (255,255,255), (j[0], -200), (j[0], 800))
+            pygame.draw.line(WIN, (255,255,255), (j[0], 0), (j[0], 800))
             pygame.draw.line(WIN, (255,255,255), (0, j[0]), (800, j[0]))
 
 
 
-def setUp_blocks():
+def select_blocks():
 
     # False = Dead | True = Alive
 
@@ -48,13 +53,15 @@ def setUp_blocks():
         #alive --> dead
         pygame.draw.rect(WIN, (0, 0, 0), pygame.Rect(x_pos, y_pos, square_size, square_size))
         GRID[y_pos // square_size][x_pos // square_size][1] = False
-        SELECTED_SQUARES.remove( (x_pos // square_size, y_pos // square_size) )
+        #SELECTED_SQUARES.remove( ( (x_pos // square_size) - 200, (y_pos // square_size) - 200 ) )
+        SELECTED_SQUARES.remove( ( (x_pos // square_size), (y_pos // square_size), True) )
 
     else:
         #dead --> alive
         pygame.draw.rect(WIN, (0, 138, 255), pygame.Rect(x_pos, y_pos, square_size, square_size))
         GRID[y_pos // square_size][x_pos // square_size][1] = True 
-        SELECTED_SQUARES.append( (x_pos // square_size, y_pos // square_size) )
+        #SELECTED_SQUARES.append( ( (x_pos // square_size) - 200, (y_pos // square_size) - 200 ) )
+        SELECTED_SQUARES.append( ( (x_pos // square_size) , (y_pos // square_size), True ) )
 
 
     print(SELECTED_SQUARES)
@@ -70,15 +77,11 @@ def get_neighbors(square):
     # ---- Implementation 1 -------
     # All cells have 8 neighbors, but for cells on the edge, they're non-present neighbors are assumed
     # to be dead 
-    neighbors = [square]
+    neighbors = [square,]
+    print(neighbors)
 
     #neighbors = [ (3, 4, False), [(3,5,False), (3,3, True), (4,3, True), (5,3, False)] ]
 
-
-    # ---- Implementation 2 -------
-    # Or we can try to just make the grid larger (30x30) and still only show the 25x25 one and every
-    # time step just reset all cells outside 26x26 to be dead
-    # I feel like this one will be harder, but the other one might not actually work
 
 
 
@@ -97,8 +100,16 @@ def evolve():
 
     """
 
-
-
+"""   --> FINISH AFTER GET NEIGHBORS FUNCTION IS DONE
+def testing():
+        y_pos = 40
+        x_pos = 0
+    
+        SELECTED_SQUARES.append( ( (x_pos // square_size)  + 20, (y_pos // square_size) ) )
+        select_blocks()
+        #del SELECTED_SQUARES[0]
+        print(SELECTED_SQUARES)
+"""
 
 def main():
     run = True
@@ -112,12 +123,18 @@ def main():
                 run = False
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                setUp_blocks()
+                select_blocks()
+                if len(SELECTED_SQUARES) > 0: #delete
+                    get_neighbors(SELECTED_SQUARES[0])    # testing code... delete later
+
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     print("START\n\n")  
-                    
+
+                #if event.key == pygame.K_DOWN:    # delete
+                    #testing()    # delete
+ 
 
         draw_grid()
         pygame.display.update()
