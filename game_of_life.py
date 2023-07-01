@@ -54,6 +54,7 @@ def select_blocks():
         pygame.draw.rect(WIN, (0, 0, 0), pygame.Rect(x_pos, y_pos, square_size, square_size))
         GRID[y_pos // square_size][x_pos // square_size][1] = False
         #SELECTED_SQUARES.remove( ( (x_pos // square_size) - 200, (y_pos // square_size) - 200 ) )
+        #this is for readjusting the grid relative to the window 
         SELECTED_SQUARES.remove( ( (x_pos // square_size), (y_pos // square_size), True) )
 
     else:
@@ -61,10 +62,9 @@ def select_blocks():
         pygame.draw.rect(WIN, (0, 138, 255), pygame.Rect(x_pos, y_pos, square_size, square_size))
         GRID[y_pos // square_size][x_pos // square_size][1] = True 
         #SELECTED_SQUARES.append( ( (x_pos // square_size) - 200, (y_pos // square_size) - 200 ) )
+        #this is for readjusting the grid relative to the window 
         SELECTED_SQUARES.append( ( (x_pos // square_size) , (y_pos // square_size), True ) )
 
-
-    #   print(SELECTED_SQUARES)
 
     return SELECTED_SQUARES 
 
@@ -74,15 +74,12 @@ def select_blocks():
 
 
 def get_neighbors(square):
-    # ---- Implementation 1 -------
-    # All cells have 8 neighbors, but for cells on the edge, they're non-present neighbors are assumed
-    # to be dead 
     x_cord = square[0]
     y_cord = square[1] 
 
+    neighbors = [square, [] ]
 
-    #neighbors = [ square,    [(square[0] + 1, square[1], GRID[x_cord][y_cord][1])                ]  ]
-    neighbors = [square]
+    status = GRID[x_cord][y_cord][1]        # delete
 
     # fix edge cases
 
@@ -90,16 +87,14 @@ def get_neighbors(square):
         for i in range(-1,2):
             for j in range(-1,2):
                 if not (i == 0 and j == 0):
-                    neighbors.append( [x_cord + i, y_cord + j] )
+                    neighbors[1].append( (x_cord + i, y_cord + j, GRID[y_cord + j][x_cord + i][1]) )
+                    #print(x_cord + i, y_cord + j)
+                    #print(GRID[y_cord + i][x_cord + j])
     except IndexError:
         pass
 
-    #if not there, then dont append to list
-    # try ____ --> except ____
-
     print(neighbors)
-    # print(x_cord, y_cord)
-
+    print(status)
     #neighbors = [ (3, 4, False), [(3,5,False), (3,3, True), (4,3, True), (5,3, False)] ]
 
 
@@ -145,7 +140,9 @@ def main():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 select_blocks()
                 if len(SELECTED_SQUARES) > 0: #delete
-                    get_neighbors(SELECTED_SQUARES[0])    # testing code... delete later
+                    print(len(SELECTED_SQUARES), "\n")
+                    for i in SELECTED_SQUARES:
+                        get_neighbors(i)
 
 
             if event.type == pygame.KEYDOWN:
