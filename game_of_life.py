@@ -21,10 +21,18 @@ TO DO:
 * have to 
 
 * Implement rules 
+	* add resurection cells to SELECTED_SQAUERS
+	* draw blocks from SELECTED SQUARES and not just when they are selected with the mouse
+		* implemetn a draw function??
+
+
 * Implement evolution/generations (timestep)
 	* Make sure that no user input can be taken once evolution starts
 
 """
+
+
+# SEPERATE DRAW BLOCKS AND SELECT BLOCKS
 
 
 #EXPAND THE GRID!!!!!
@@ -72,7 +80,10 @@ def select_blocks():
         GRID[y_pos // square_size][x_pos // square_size][1] = False
         #SELECTED_SQUARES.remove( ( (x_pos // square_size) - 200, (y_pos // square_size) - 200 ) )
         #this is for readjusting the grid relative to the window 
-        SELECTED_SQUARES.remove( [ (x_pos // square_size), (y_pos // square_size), True ] )
+        for i in SELECTED_SQUARES:
+            if i[0] == x_pos // square_size and i[1] == y_pos // square_size:
+                SELECTED_SQUARES.remove(i)
+        #SELECTED_SQUARES.remove( [ (x_pos // square_size), (y_pos // square_size), True ] )
 
     else:
         #dead --> alive
@@ -84,7 +95,6 @@ def select_blocks():
 
 
     return SELECTED_SQUARES 
-
 
 
 # HOW DO WE ENSURE THAT BLOCKS CANNOT BE SELECTED AFTER THE EVOLVE FUNCTION HAS STARTED
@@ -101,7 +111,7 @@ def get_neighbors(square):
         for i in range(-1,2):
             for j in range(-1,2):
                 if not (i == 0 and j == 0):
-                    neighbors[1].append( [x_cord + i, y_cord + j, GRID[y_cord + j][x_cord + i][1] ] )
+                    neighbors[1].append( [x_cord + i, y_cord + j, GRID[y_cord + j][x_cord + i][1]] )
 
     except IndexError:
         pass
@@ -142,17 +152,22 @@ def update_board():
 
         if alive_neighbors < 2:
             cell[0][2] = False
+            print("selected squares: ", SELECTED_SQUARES)
+            # instead of ^ > SELECTED_SQUARRES.remove (this one) --> set = False
             #pass
-        elif alive_neighbors > 3:    # pretty sure this is an elif, but if we get bugs it might be an if
+        if alive_neighbors > 3:    # pretty sure this is an elif, but if we get bugs it might be an if
             cell[0][2] = False
+            print("selected squares: ", SELECTED_SQUARES)
             #pass
+        if alive_neighbors == 2 or alive_neighbors == 3:
+            cell[0][2] = True
+            print("selected squares: ", SELECTED_SQUARES)
 
 
-        print("alive: " + str(alive_neighbors), "dead: " + str(dead_neighbors) )
+        print("alive: " + str(alive_neighbors), "dead: " + str(dead_neighbors), "\n" )
 
      # if a cell that was dead become alive, we have to append it to SELECTED_SQUARES
-        #print(cell)
-        print("\n")
+        #print(SELECTED_SQUARES)
         
 
 
@@ -173,17 +188,6 @@ def evolve():
 
 
 
-"""   --> FINISH AFTER GET NEIGHBORS FUNCTION IS DONE
-def testing():
-        y_pos = 40
-        x_pos = 0
-    
-        SELECTED_SQUARES.append( ( (x_pos // square_size)  + 20, (y_pos // square_size) ) )
-        select_blocks()
-        #del SELECTED_SQUARES[0]
-        print(SELECTED_SQUARES)
-"""
-
 def main():
     run = True
     clock = pygame.time.Clock()
@@ -197,6 +201,7 @@ def main():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 select_blocks()
+                #draw_blocks()   # idek man
                 update_board()
   
  
