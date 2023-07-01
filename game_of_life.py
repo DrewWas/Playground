@@ -14,7 +14,6 @@ HOW TO PLAY:
 """
 
 
-
 """
 TO DO:
 
@@ -73,7 +72,7 @@ def select_blocks():
         GRID[y_pos // square_size][x_pos // square_size][1] = False
         #SELECTED_SQUARES.remove( ( (x_pos // square_size) - 200, (y_pos // square_size) - 200 ) )
         #this is for readjusting the grid relative to the window 
-        SELECTED_SQUARES.remove( ( (x_pos // square_size), (y_pos // square_size), True) )
+        SELECTED_SQUARES.remove( [ (x_pos // square_size), (y_pos // square_size), True ] )
 
     else:
         #dead --> alive
@@ -81,7 +80,7 @@ def select_blocks():
         GRID[y_pos // square_size][x_pos // square_size][1] = True 
         #SELECTED_SQUARES.append( ( (x_pos // square_size) - 200, (y_pos // square_size) - 200 ) )
         #this is for readjusting the grid relative to the window 
-        SELECTED_SQUARES.append( ( (x_pos // square_size) , (y_pos // square_size), True ) )
+        SELECTED_SQUARES.append( [ (x_pos // square_size) , (y_pos // square_size), True ] )
 
 
     return SELECTED_SQUARES 
@@ -102,9 +101,7 @@ def get_neighbors(square):
         for i in range(-1,2):
             for j in range(-1,2):
                 if not (i == 0 and j == 0):
-                    neighbors[1].append( (x_cord + i, y_cord + j, GRID[y_cord + j][x_cord + i][1]) )
-
-        #print(neighbors, "\n") 	# delete after debug
+                    neighbors[1].append( [x_cord + i, y_cord + j, GRID[y_cord + j][x_cord + i][1] ] )
 
     except IndexError:
         pass
@@ -123,28 +120,40 @@ def update_board():
     * Any dead cell with exactly 3 neighbors comes to life
     """
 
-
     for i in SELECTED_SQUARES:
-        alive = 0
-        dead = 0
+        alive_neighbors = 0
+        dead_neighbors = 0
         cell = get_neighbors(i)
-        for i in cell[1]:
-            if i[2] == False:
-                dead += 1
-            if i[2] == True:
-                alive += 1
+        for j in cell[1]:
+            if j[2] == False:
+                dead_neighbors += 1
+                resurection_check = get_neighbors(j)
+                for k in resurection_check[1]:
+                    resurection_alive_neighbors = 0
+                    if k[2] == True:
+                        resurection_alive_neighbors += 1
+                if resurection_alive_neighbors == 3:
+                    resurection_check[0][2] = True
+                    SELECTED_SQUARES.append(resurection_check[0])
 
-        print("alive: " + str(alive), "dead: " + str(dead) )
+
+            if j[2] == True:
+                alive_neighbors += 1
+
+        if alive_neighbors < 2:
+            cell[0][2] = False
+            #pass
+        elif alive_neighbors > 3:    # pretty sure this is an elif, but if we get bugs it might be an if
+            cell[0][2] = False
+            #pass
+
+
+        print("alive: " + str(alive_neighbors), "dead: " + str(dead_neighbors) )
 
      # if a cell that was dead become alive, we have to append it to SELECTED_SQUARES
-        print(cell)
+        #print(cell)
         print("\n")
         
-
-        
-
-
-
 
 
 def evolve():
@@ -161,11 +170,6 @@ def evolve():
 
 
     return None
-
-
-
-
-
 
 
 
