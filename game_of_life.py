@@ -1,6 +1,9 @@
 # Conways game of life
 # https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life
 
+# * This program uses the Moore neighborhood system *
+
+
 """
 HOW TO PLAY:
 -----------------------------------------------------------------------------------
@@ -9,6 +12,21 @@ HOW TO PLAY:
 
 * To begin the simulation, press RETURN
 """
+
+
+
+"""
+TO DO:
+
+* expand grid ((0,0) is technically like (20,20), centered!!!! --> Implement rules/evolution first, because we might not
+* have to 
+
+* Implement rules 
+* Implement evolution/generations (timestep)
+	* Make sure that no user input can be taken once evolution starts
+
+"""
+
 
 #EXPAND THE GRID!!!!!
 #IMPLEMENT TIME STEP!!!
@@ -79,41 +97,77 @@ def get_neighbors(square):
 
     neighbors = [square, [] ]
 
-    status = GRID[x_cord][y_cord][1]        # delete
-
-    # fix edge cases
 
     try:
         for i in range(-1,2):
             for j in range(-1,2):
                 if not (i == 0 and j == 0):
                     neighbors[1].append( (x_cord + i, y_cord + j, GRID[y_cord + j][x_cord + i][1]) )
-                    #print(x_cord + i, y_cord + j)
-                    #print(GRID[y_cord + i][x_cord + j])
+
+        #print(neighbors, "\n") 	# delete after debug
+
     except IndexError:
         pass
 
-    print(neighbors)
-    print(status)
-    #neighbors = [ (3, 4, False), [(3,5,False), (3,3, True), (4,3, True), (5,3, False)] ]
+    return neighbors
+
+
+
+def update_board():
+
+    """
+    RULES:
+    * Any live cell with fewer than 2 neighbors dies
+    * Any live cell with more than 3 neighbors dies
+    * Any live cell with 2 or 3 live neighbors lives 
+    * Any dead cell with exactly 3 neighbors comes to life
+    """
+
+
+    for i in SELECTED_SQUARES:
+        alive = 0
+        dead = 0
+        cell = get_neighbors(i)
+        for i in cell[1]:
+            if i[2] == False:
+                dead += 1
+            if i[2] == True:
+                alive += 1
+
+        print("alive: " + str(alive), "dead: " + str(dead) )
+
+     # if a cell that was dead become alive, we have to append it to SELECTED_SQUARES
+        print(cell)
+        print("\n")
+        
+
+        
+
 
 
 
 
 def evolve():
+
+    time_step = 0
+
     """
-    for i in selected_squares:
-        get_neighbors(i)
-    """    				# something like this 
+    if keydown == p (automate later):
+        -- turn off inputs -- 
+        time_step += 1
+        update_board()
+        
+    """
 
 
-    print(GRID)
     return None
-    """
-    RULES: 
-    * 
 
-    """
+
+
+
+
+
+
 
 """   --> FINISH AFTER GET NEIGHBORS FUNCTION IS DONE
 def testing():
@@ -139,17 +193,17 @@ def main():
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 select_blocks()
-                if len(SELECTED_SQUARES) > 0: #delete
-                    print(len(SELECTED_SQUARES), "\n")
-                    for i in SELECTED_SQUARES:
-                        get_neighbors(i)
-
+                update_board()
+  
+ 
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
+                    # evolve()
                     print("START\n\n")  
 
-                #if event.key == pygame.K_DOWN:    # delete
+                if event.key == pygame.K_DOWN:    # delete
+                    pass
                     #testing()    # delete
  
 
