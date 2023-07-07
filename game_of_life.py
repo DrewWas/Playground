@@ -40,6 +40,7 @@ TO DO:
 
 
 import pygame
+from time import sleep
 
 # Set up
 pygame.init()
@@ -172,8 +173,9 @@ def update_board():
 
 
 def evolve():
+    sleep(1)
+    update_board()
 
-    time_step = 0
 
     """
     if keydown == p (automate later):
@@ -190,6 +192,7 @@ def evolve():
 
 def main():
     run = True
+    gameStart = False
     clock = pygame.time.Clock()
 
 
@@ -208,12 +211,14 @@ def main():
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    # evolve()
-                    print("START\n\n")  
+                    gameStart = True
 
                 if event.key == pygame.K_DOWN:    # delete
                     pass
                     #testing()    # delete
+
+            if gameStart == True:
+                evolve()
  
 
         draw_grid()
