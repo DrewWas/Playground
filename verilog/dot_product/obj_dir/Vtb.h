@@ -5,19 +5,19 @@
 // The class here is then constructed to instantiate the design.
 // See the Verilator manual for examples.
 
-#ifndef VERILATED_VAND_H_
-#define VERILATED_VAND_H_  // guard
+#ifndef VERILATED_VTB_H_
+#define VERILATED_VTB_H_  // guard
 
 #include "verilated.h"
 
-class Vand__Syms;
-class Vand___024root;
+class Vtb__Syms;
+class Vtb___024root;
 
 // This class is the main interface to the Verilated model
-class alignas(VL_CACHE_LINE_BYTES) Vand VL_NOT_FINAL : public VerilatedModel {
+class alignas(VL_CACHE_LINE_BYTES) Vtb VL_NOT_FINAL : public VerilatedModel {
   private:
     // Symbol table holding complete model state (owned by this class)
-    Vand__Syms* const vlSymsp;
+    Vtb__Syms* const vlSymsp;
 
   public:
 
@@ -28,9 +28,6 @@ class alignas(VL_CACHE_LINE_BYTES) Vand VL_NOT_FINAL : public VerilatedModel {
     // PORTS
     // The application code writes and reads these signals to
     // propagate new values into/out from the Verilated model.
-    VL_IN8(&input_1,0,0);
-    VL_IN8(&input_2,0,0);
-    VL_OUT8(&out,0,0);
 
     // CELLS
     // Public to allow access to /* verilator public */ items.
@@ -38,19 +35,19 @@ class alignas(VL_CACHE_LINE_BYTES) Vand VL_NOT_FINAL : public VerilatedModel {
 
     // Root instance pointer to allow access to model internals,
     // including inlined /* verilator public_flat_* */ items.
-    Vand___024root* const rootp;
+    Vtb___024root* const rootp;
 
     // CONSTRUCTORS
     /// Construct the model; called by application code
     /// If contextp is null, then the model will use the default global context
     /// If name is "", then makes a wrapper with a
     /// single model invisible with respect to DPI scope names.
-    explicit Vand(VerilatedContext* contextp, const char* name = "TOP");
-    explicit Vand(const char* name = "TOP");
+    explicit Vtb(VerilatedContext* contextp, const char* name = "TOP");
+    explicit Vtb(const char* name = "TOP");
     /// Destroy the model; called (often implicitly) by application code
-    virtual ~Vand();
+    virtual ~Vtb();
   private:
-    VL_UNCOPYABLE(Vand);  ///< Copying not allowed
+    VL_UNCOPYABLE(Vtb);  ///< Copying not allowed
 
   public:
     // API METHODS

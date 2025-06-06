@@ -3,11 +3,11 @@
 //
 // Internal details; most user sources do not need this header,
 // unless using verilator public meta comments.
-// Suggest use Vand.h instead.
+// Suggest use Vtb.h instead.
 
 
-#ifndef VERILATED_VAND__PCH_H_
-#define VERILATED_VAND__PCH_H_  // guard
+#ifndef VERILATED_VTB__PCH_H_
+#define VERILATED_VTB__PCH_H_  // guard
 
 // GCC and Clang only will precompile headers (PCH) for the first header.
 // So, make sure this is the one and only PCH.
@@ -20,8 +20,8 @@
 
 #include "verilated.h"
 
-#include "Vand__Syms.h"
-#include "Vand.h"
+#include "Vtb__Syms.h"
+#include "Vtb.h"
 
 // Additional include files added using '--compiler-include'
 

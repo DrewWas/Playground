@@ -1,16 +1,16 @@
 // Verilated -*- C++ -*-
 // DESCRIPTION: Verilator output: Symbol table implementation internals
 
-#include "Vand__pch.h"
-#include "Vand.h"
-#include "Vand___024root.h"
+#include "Vtb__pch.h"
+#include "Vtb.h"
+#include "Vtb___024root.h"
 
 // FUNCTIONS
-Vand__Syms::~Vand__Syms()
+Vtb__Syms::~Vtb__Syms()
 {
 }
 
-Vand__Syms::Vand__Syms(VerilatedContext* contextp, const char* namep, Vand* modelp)
+Vtb__Syms::Vtb__Syms(VerilatedContext* contextp, const char* namep, Vtb* modelp)
     : VerilatedSyms{contextp}
     // Setup internal state of the Syms class
     , __Vm_modelp{modelp}
@@ -18,7 +18,7 @@ Vand__Syms::Vand__Syms(VerilatedContext* contextp, const char* namep, Vand* mode
     , TOP{this, namep}
 {
         // Check resources
-        Verilated::stackCheck(25);
+        Verilated::stackCheck(138);
     // Configure time unit / time precision
     _vm_contextp__->timeunit(-12);
     _vm_contextp__->timeprecision(-12);
