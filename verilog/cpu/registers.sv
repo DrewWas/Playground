@@ -1,5 +1,6 @@
 module registers #(
-    parameter WIDTH = 32;
+    parameter WIDTH = 32,
+    parameter NUM_REGS = 32
 ) (
 
     input logic clk,
@@ -12,13 +13,14 @@ module registers #(
 );
 
     // Create 32 independent 32 bit wide registers 
-    logic [WIDTH - 1:0] registers [WIDTH - 1:0];
+    logic [WIDTH - 1:0] registers [NUM_REGS - 1:0];
 
 
     // Asynchronous read
     always_comb begin
-        read1_data = registers[read1_addr];
-        read2_data = registers[read2_addr];
+        // Block reads from reg[0] to comply w RISC-V standards
+        read1_data = (read1_addr == 5'b0) ? {WIDTH{1'b0}} : registers[read1_addr];
+        read2_data = (read2_addr == 5'b0) ? {WIDTH{1'b0}} : registers[read2_addr];
     end
 
 
@@ -27,12 +29,13 @@ module registers #(
 
         if (reset) begin
             // Reset all registers to 0
-            for (int i = 0; i < WIDTH; i++) begin
-                registers[i] <= 32'd0;
+            for (int i = 0; i < NUM_REGS; i++) begin
+                registers[i] <= {WIDTH{1'b0}};
             end
 
-        end else if (write_en) begin
+        end else if (write_en && (write_addr != 5'd0)) begin
             // Otherwise update addr to write_data
+            // Block writes to reg[0] to comply w RISC-V standards
             registers[write_addr] <= write_data;
         end
     end
