@@ -1,3 +1,4 @@
+
 module registers #(
     parameter WIDTH = 32,
     parameter NUM_REGS = 32
@@ -25,7 +26,7 @@ module registers #(
 
 
     // Synchronous write 
-    always @(posedge clk) begin
+    always_ff @(posedge clk) begin
 
         if (reset) begin
             // Reset all registers to 0

@@ -1,7 +1,4 @@
 
-// TODO: Add carry_out, overflow_out, zero?, and negative flags 
-// Arithmetic ops might have to be implemented from scratch
-
 module ALU #(
 
     parameter DATA_IN_WIDTH = 32;
