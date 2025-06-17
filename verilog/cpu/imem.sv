@@ -1,12 +1,11 @@
 
 module imem #(
     parameter instruct_size = 4,
-    parameter num_instructs = 512
+    parameter num_instructs = 512,
+    parameter addr_width = $clog2(num_instructs)
 ) (
     input logic clk,
-    input logic reset,
-    input logic [instruct_size - 1:0] addr,
-    input logic read_en,
+    input logic [addr_width - 1:0] addr,
     output logic [instruct_size - 1:0] read_instruction 
     
 );
@@ -16,19 +15,17 @@ module imem #(
     logic [instruct_size - 1:0] instructions [num_instructs - 1:0];
 
 
-    always_ff @(posedge clk) begin
-
-        if (reset) begin
-            for (int i = 0; i < num_instructs; i++) begin
-                instructions[i] <= {instruct_size{1'b0}};
-            end
-        end else if (read_en) begin
-            read_instruction <= instructions[addr]; 
-        end
-
+    // Load in the memory file 
+    // ENSURE program.hex IS THE CORRECT SIZE!
+    initial begin
+        $readmemh("program.hex", instructions);
     end
 
 
+    // Synchronous 1-cycle latency mem read
+    always_ff @(posedge clk) begin
+        read_instruction <= instructions[addr];
+    end
 
 
 endmodule
