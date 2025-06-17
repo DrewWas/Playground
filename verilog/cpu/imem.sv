@@ -1,6 +1,6 @@
 
 module imem #(
-    parameter instruct_size = 4,
+    parameter instruct_size = 32,  // Includes op-code & registers 
     parameter num_instructs = 512,
     parameter addr_width = $clog2(num_instructs)
 ) (
