@@ -22,7 +22,7 @@ module ALU #(
             4'b0100 : alu_out = scalar_a << scalar_b[4:0];
             4'b0101 : alu_out = scalar_a >> scalar_b[4:0];
             4'b0110 : alu_out = {DATA_OUT_WIDTH{(scalar_a && scalar_b)}};
-            4'b0111 : alu_out = {DATA_OUT_WIDTH{(scalar_a || scalar_b)}};
+            4'b0111 : alu_out = ~scalar_a;
             4'b1000 : alu_out = scalar_a & scalar_b;
             4'b1001 : alu_out = scalar_a | scalar_b;
             4'b1010 : alu_out = scalar_a ^ scalar_b;

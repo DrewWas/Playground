@@ -35,8 +35,6 @@ module decoder #(
     assign branch_taken         = instruction[11];
 
 
-
-
 endmodule
 
 
