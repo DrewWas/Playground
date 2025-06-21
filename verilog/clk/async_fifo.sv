@@ -78,13 +78,23 @@ module async_fifo #(
     logic [PNTR_WIDTH:0] write_pointer_gray_sync1, write_pointer_gray_rdclk;
 
     always_ff @(posedge rd_clk) begin
-        write_pointer_gray_sync1 <= write_pointer_gray;
-        write_pointer_gray_rdclk <= write_pointer_gray_sync1;
+        if (reset) begin
+            write_pointer_gray_sync1 <= '0;
+            write_pointer_gray_rdclk <= '0;
+        end else begin
+            write_pointer_gray_sync1 <= write_pointer_gray;
+            write_pointer_gray_rdclk <= write_pointer_gray_sync1;
+        end
     end
 
     always_ff @(posedge wr_clk) begin
-        read_pointer_gray_sync1 <= read_pointer_gray;
-        read_pointer_gray_wrclk <= read_pointer_gray_sync1;
+        if (reset) begin
+            read_pointer_gray_sync1 <= '0;
+            read_pointer_gray_wrclk <= '0;
+        end else begin
+            read_pointer_gray_sync1 <= read_pointer_gray;
+            read_pointer_gray_wrclk <= read_pointer_gray_sync1;
+        end
 
     end
 
@@ -96,7 +106,7 @@ module async_fifo #(
     always_comb begin
         fifo_empty = (read_pointer == write_pointer_bin_rdclk);
         // Read more about this and actually understand it
-        fifo_full = (write_pointer == {!read_pointer_bin_wrclk[PNTR_WIDTH], read_pointer_bin_wrclk[PNTR_WIDTH - 1:0]})
+        fifo_full = (write_pointer == {!read_pointer_bin_wrclk[PNTR_WIDTH], read_pointer_bin_wrclk[PNTR_WIDTH - 1:0]});
     end
 
 endmodule
