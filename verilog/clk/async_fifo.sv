@@ -39,7 +39,7 @@ module async_fifo #(
         if (reset) begin
             write_pointer <= '0;
         end else if (write_en && !fifo_full) begin
-            fifo[write_pointer[PNTR_WIDTH - 1:0]] <= data_in;
+            fifo[write_pointer[PNTR_WIDTH - 1:0]] <= data_in; // This might be wrong
             write_pointer <= write_pointer + 1;
         end
     end
@@ -48,10 +48,21 @@ module async_fifo #(
         if (reset) begin
             read_pointer <= '0;
         end else if (read_en && !fifo_empty) begin
-            data_out <= fifo[read_pointer[PNTR_WIDTH - 1:0]];
+            data_out <= fifo[read_pointer[PNTR_WIDTH - 1:0]]; // This might be wrong
             read_pointer <= read_pointer + 1;
         end
     end
+
+    // Binary -> Gray Function
+    function logic [PNTR_WIDTH : 0] bin2gray(input logic [PNTR_WIDTH:0] byte);
+        return (byte >> 1) ^ byte;
+    endfunction
+
+
+    // Gray -> Binary Function
+    function logic gray2bin(port_list);
+        
+    endfunction
 
 
 endmodule
