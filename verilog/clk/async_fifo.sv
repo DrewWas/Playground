@@ -1,5 +1,7 @@
 
 // Practicing crossing clock domains
+`timescale 1ns/1ps // Remove after testing !!
+import conversionFunctions::*;
 
 module async_fifo #(
 
@@ -55,22 +57,6 @@ module async_fifo #(
         end
     end
 
-    // Binary -> Gray Function
-    function logic [PNTR_WIDTH : 0] bin2gray(input logic [PNTR_WIDTH:0] b);
-        return (b >> 1) ^ b;
-    endfunction
-
-
-    // Gray -> Binary Function
-    function logic [PNTR_WIDTH : 0] gray2bin(input logic [PNTR_WIDTH:0] gray);
-        logic [PNTR_WIDTH:0] b;
-        b[PNTR_WIDTH] = gray[PNTR_WIDTH];
-        for (int i = PNTR_WIDTH - 1; i >= 0; i -= 1) begin
-            b[i] = b[i+1] ^ gray[i];
-        end
-        return b;
-    endfunction
-
     // Bin -> Gray code encoding/decoding logic & clk crossing
     logic [PNTR_WIDTH:0] write_pointer_gray;
     logic [PNTR_WIDTH:0] read_pointer_gray;
@@ -110,7 +96,6 @@ module async_fifo #(
     end
 
 endmodule
-
 
 
 
