@@ -32,7 +32,7 @@ module tb;
     logic [PNTR_WIDTH:0] bin_vals [9:0];
     logic [PNTR_WIDTH:0] gray_vals [9:0];
     logic [PNTR_WIDTH:0] decoded_vals [9:0];
-    logic [PNTR_WIDTH:0] test1_values [9:0] = '{0, 10, 51, 511, 1, 45, 100, 101, 250, 41};
+    logic [PNTR_WIDTH:0] test1_values [9:0] = '{0, 10, 51, 511, 1, 45, 100, 101, 250, 513};
     initial begin
 
         test_num = 0;
@@ -74,10 +74,15 @@ module tb;
         #10 reset = 1;
         #10 reset = 0;
         write_en = 1;
-        for (shortint i = 0; i < FIFO_DEPTH; i++) begin
+        for (shortint i = 0; i <= FIFO_DEPTH; i++) begin
             data_in = i; // Each reg holds its address value (and is fully filled)
             @(posedge wr_clk);
         end
+
+        $display("FIFO full?: %0d", fifo_full);
+        $display("Read pointers %0d, %0d", dut.read_pointer, dut.read_pointer_bin_wrclk);
+        $display("Write pointers %0d, %0d", dut.write_pointer, dut.write_pointer_bin_rdclk);
+
 
         // Try inserting extra word
         data_in = 16'hDEAD;
@@ -86,14 +91,9 @@ module tb;
         read_en = 1;
 
         // Make sure that fifo is full and extra word is not present
-        for (shortint j = 0; j < FIFO_DEPTH; j++) begin
+        for (shortint j = 0; j < FIFO_DEPTH + 5; j++) begin
             @(posedge rd_clk);
-            $display("Pointer: %0d", dut.write_pointer_bin_rdclk);
-            if (fifo_full != 1) begin
-                $display("FIFO not full on step: %0d", j);
-            end
-            $display("Data out: %0d", dut.data_out);
-            //@(posedge rd_clk);
+            $display("Data out: %0d | FIFO FULL?: %0d", dut.data_out, fifo_full);
             
         end
 

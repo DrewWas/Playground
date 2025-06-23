@@ -92,9 +92,11 @@ module async_fifo #(
     always_comb begin
         fifo_empty = (read_pointer == write_pointer_bin_rdclk);
         // Read more about this and actually understand it
-        fifo_full = (write_pointer == {!read_pointer_bin_wrclk[PNTR_WIDTH], read_pointer_bin_wrclk[PNTR_WIDTH - 1:0]});
-        //fifo_full = (write_pointer_bin_rdclk == FIFO_DEPTH);
+        //fifo_full = (write_pointer_bin_rdclk == {!read_pointer_bin_wrclk[PNTR_WIDTH], read_pointer_bin_wrclk[PNTR_WIDTH - 1:0]});
+        fifo_full = (write_pointer == {!read_pointer_bin_wrclk[PNTR_WIDTH], read_pointer_bin_wrclk[PNTR_WIDTH - 1:0]}); // why not the synced version??
+
     end
+
 
 endmodule
 
