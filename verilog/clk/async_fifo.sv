@@ -93,6 +93,7 @@ module async_fifo #(
         fifo_empty = (read_pointer == write_pointer_bin_rdclk);
         // Read more about this and actually understand it
         fifo_full = (write_pointer == {!read_pointer_bin_wrclk[PNTR_WIDTH], read_pointer_bin_wrclk[PNTR_WIDTH - 1:0]});
+        //fifo_full = (write_pointer_bin_rdclk == FIFO_DEPTH);
     end
 
 endmodule

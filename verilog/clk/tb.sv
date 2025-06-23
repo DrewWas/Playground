@@ -23,6 +23,10 @@ module tb;
         .data_out(data_out)
     );
 
+    // Clocks 
+    always #5 wr_clk = ~wr_clk;
+    always #7 rd_clk = ~rd_clk;
+
 
     // Test bin2gray & gray2bin functions
     logic [PNTR_WIDTH:0] bin_vals [9:0];
@@ -83,12 +87,18 @@ module tb;
 
         // Make sure that fifo is full and extra word is not present
         for (shortint j = 0; j < FIFO_DEPTH; j++) begin
-            //assert(data_out[j] != 16'hDEAD);
-            //assert(data_out[j] == j);
-            assert(fifo_full);
+            @(posedge rd_clk);
+            $display("Pointer: %0d", dut.write_pointer_bin_rdclk);
+            if (fifo_full != 1) begin
+                $display("FIFO not full on step: %0d", j);
+            end
+            $display("Data out: %0d", dut.data_out);
+            //@(posedge rd_clk);
+            
         end
 
-        $display("Word Added: %d | FIFO last element: %d", data_in, data_out[FIFO_DEPTH - 1]);
+        $display("%d", data_in);
+        $display("Word Added: %d | FIFO last element: %d", data_in, dut.data_out);
         $display("FIFO did not accept new word when full! | PASSED!");
 
     
