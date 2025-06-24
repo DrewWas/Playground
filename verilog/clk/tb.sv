@@ -27,14 +27,23 @@ module tb;
     always #5 wr_clk = ~wr_clk;
     always #7 rd_clk = ~rd_clk;
 
-
-    // Test bin2gray & gray2bin functions
+    // Test 0s logics
     logic [PNTR_WIDTH:0] bin_vals [9:0];
     logic [PNTR_WIDTH:0] gray_vals [9:0];
     logic [PNTR_WIDTH:0] decoded_vals [9:0];
     logic [PNTR_WIDTH:0] test1_values [9:0] = '{0, 10, 51, 511, 1, 45, 100, 101, 250, 513};
-    initial begin
 
+    // Test 2s logics
+    logic [PNTR_WIDTH:0] start_pointer = dut.read_pointer;
+    logic fifo_flag = dut.fifo_empty;
+
+
+
+
+
+
+    initial begin
+        // Test bin2gray & gray2bin functions ----------------------------------
         test_num = 0;
         $display("\nTest %0d: bin2gray", test_num);
 
@@ -54,11 +63,7 @@ module tb;
             end
         end
 
-    end
-
-
-    // Test write when full
-    initial begin
+        // Test write when full ------------------------------------------------
         test_num = 1;
         $display("\nTest %0d: Write when full", test_num);
 
@@ -111,11 +116,47 @@ module tb;
 
         $display("Overflow-on-full test PASSED\n");
 
+
+        // Test read when empty ------------------------------------------------
+        test_num = 2;
+        $display("\nTest %0d: Read when empty", test_num);
+
+        // Initialize signals 
+        wr_clk = 0;
+        rd_clk = 0;
+        reset = 1;
+        write_en = 0;
+        read_en = 0;
+        data_in = 0;
+
+        #10 reset = 0;
+
+        // Capture initial signals 
+        $display("Current read pointer: %0d", start_pointer);
+        $display("Current fifo_empty flag: %0d", fifo_flag);
+
+        // Attempt to read
+        $display("\nAttempting to read\n");
+        read_en = 1;
+        repeat(5) @(posedge rd_clk);
+
+        // Make sure pointer/flag is the same
+        if (dut.read_pointer !== start_pointer) begin
+            $display("Start Pointer: %0d | End Pointer: %0d", start_pointer, dut.read_pointer);
+            $fatal("Read pointer advanced on empty read!");
+        end
+        if (!dut.fifo_empty) begin
+            $display("Start Flag: %0d | End Flag: %0d", fifo_flag, dut.fifo_empty);
+            $fatal("fifo_empty de-asserted during empty read!");
+        end
+
+        $display("Current read pointer: %0d", dut.read_pointer);
+        $display("Current fifo_empty flag: %0d", dut.fifo_empty);
+        $display("Pointers and Flags equal! | TEST PASSED!");
+        read_en = 0;
+
         $finish;
     end
-
-
-    // Test read when empty 
 
 // Test massive dump in (long burst)
 
@@ -128,7 +169,7 @@ module tb;
 // Async reset during operation
 
 
-
+    
 endmodule;
 
 
