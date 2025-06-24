@@ -75,33 +75,42 @@ module tb;
         #10 reset = 0;
         write_en = 1;
         for (shortint i = 0; i <= FIFO_DEPTH; i++) begin
-            data_in = i; // Each reg holds its address value (and is fully filled)
+            data_in = i; 
             @(posedge wr_clk);
         end
-
-        $display("FIFO full?: %0d", fifo_full);
-        $display("Read pointers %0d, %0d", dut.read_pointer, dut.read_pointer_bin_wrclk);
-        $display("Write pointers %0d, %0d", dut.write_pointer, dut.write_pointer_bin_rdclk);
+        if (fifo_full) begin
+            $display("FIFO Full!");
+        end
 
 
         // Try inserting extra word
         data_in = 16'hDEAD;
+        $display("Attempting to write: %0d", data_in);
         @(posedge wr_clk);
         write_en = 0;
         read_en = 1;
 
-        // Make sure that fifo is full and extra word is not present
-        for (shortint j = 0; j < FIFO_DEPTH + 5; j++) begin
+        // Read through the fifo (which frees space) and make sure 
+        // That 0xDEAD wasn't inserted anywhere and that each value = its fifo addr
+        for (shortint k = 0; k <= FIFO_DEPTH; k++) begin
             @(posedge rd_clk);
-            $display("Data out: %0d | FIFO FULL?: %0d", dut.data_out, fifo_full);
-            
+            if (dut.data_out === 16'hDEAD) begin
+                $fatal("Overflow word appeared – test FAILED");
+            end
+            if (dut.data_out !== k) begin
+                $fatal("Data mismatch at %0d: got %0d", k, dut.data_out);
+            end
+            if (k < 10 || k > 500) begin // Only check last 500
+                $display("data_out = %0d ", dut.data_out);
+            end
+            if (k == 30) begin
+                $display("..."); // Just to show intermediary ...
+            end
         end
+        read_en = 0;
 
-        $display("%d", data_in);
-        $display("Word Added: %d | FIFO last element: %d", data_in, dut.data_out);
-        $display("FIFO did not accept new word when full! | PASSED!");
+        $display("Overflow-on-full test PASSED\n");
 
-    
         $finish;
     end
 
