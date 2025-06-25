@@ -41,7 +41,8 @@ module tb;
     logic [PNTR_WIDTH:0] start_read_pointer, start_write_pointer, end_read_pointer, end_write_pointer;
     logic start_fifo_flag, end_fifo_flag;
 
-
+    // Test 4s logics 
+    shortint scratch;
 
 
     initial begin
@@ -214,24 +215,82 @@ module tb;
         $display("Read and Write pointers reset to 0! | TESET PASSED!");
 
 
+        // Test pointer wrap around -------------------------------------------
+        test_num = 4;
+        $display("\nTest %0d: Pointer wrap around", test_num);
 
+        // Initialize signals 
+        wr_clk = 0;
+        rd_clk = 0;
+        reset = 1;
+        write_en = 0;
+        read_en = 0;
+        data_in = 0;
+        data_out = 0;
 
-        // Async reset during operation -----------------------------------------
+        // Write 512 words  (values 0 … 511) -> expect fifo_full = 1
+        reset = 0;
+        write_en = 1;
+        for (shortint i = 0; i <= FIFO_DEPTH; i++) begin
+            data_in = i;
+            @(posedge wr_clk);
+        end 
+        $display("FIFO FULL: %0d", dut.fifo_full);
+        $display("Write pointer: %0d", dut.write_pointer);
+        $display("-----------------------");
+        write_en = 0;
 
+        // Read  512 words  (check order) -> expect fifo_empty = 1
+        read_en = 1;
+        for (shortint i = 0; i <= FIFO_DEPTH; i++) begin
+            @(posedge rd_clk);
+            if (i < 10 || i > 500) begin // Only check last 500
+                $display("Data out = %0d ", dut.data_out);
+            end
+            if (i == 30) begin
+                $display("..."); // Just to show intermediary ...
+            end
+        end
+        read_en = 0;
+        $display("FIFO EMPTY: %0d", dut.fifo_empty);
+        $display("Read pointer: %0d", dut.read_pointer);
+        $display("-----------------------");
 
+        // Write another 512 (512 … 1023)        -> full again
+        write_en = 1;
+        for (shortint i = 0; i <= FIFO_DEPTH; i++) begin
+            data_in = i;
+            @(posedge wr_clk);
+        end 
+        $display("Write pointer: %0d", dut.write_pointer);
+        $display("FIFO FULL: %0d", dut.fifo_full);
+        $display("-----------------------");
+        write_en = 0;
+        
+        // Read another 512 (check order)        -> empty again
+        read_en = 1;
+        for (shortint i = 0; i <= FIFO_DEPTH; i++) begin
+            @(posedge rd_clk);
+                scratch = dut.data_out;
+        end
+        read_en = 0;
+        $display("FIFO EMPTY: %0d", dut.fifo_empty);
+        $display("Read pointer: %0d", dut.read_pointer);
+        $display("FIFO FULL: %0d", dut.fifo_full);
+        $display("-----------------------\n");
 
-
-// Test massive dump in (long burst)
-
-// Test pointer  wrap around
-
-// Test different clock frequency ratios
-
-
-
+        // Final assertions on pointers and flags 
+        if (!dut.fifo_empty || dut.fifo_full) begin
+            $display("FIFO still full or not empty | TEST FAILED! ");
+        end else if (dut.read_pointer != 0 || dut.write_pointer != 0) begin
+            $display("Pointer Error | TEST FAILED!");
+        end else begin
+            $display("TEST PASSED!\n");
+        end
 
         $finish;
     end
+
     
 endmodule;
 
