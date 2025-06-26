@@ -2,7 +2,8 @@
 `timescale 1ns/10ps
 
 module matmul #(
-    parameter N = 256,
+    parameter DATA_WIDTH=16,
+    parameter N = 256, 
     parameter M = 256,
     
     parameter J = 256,
@@ -11,14 +12,14 @@ module matmul #(
 
     input logic clk,
     input logic reset,
-    input logic [N-1:0] mat1 [M-1:0],
-    input logic [J-1:0] mat2 [K-1:0],
-    output logic [M-1:0] outmat [J-1:0]
+    input logic signed [DATA_WIDTH-1:0] mat1 [N-1:0][M-1:0],
+    input logic signed [DATA_WIDTH-1:0] mat2 [J-1:0][K-1:0],
+    output logic signed [DATA_WIDTH-1:0] outmat [M-1:0][J-1:0]
 
 );
 
 
-
+    //assign outmat = 16'd0;
 
 endmodule
 
