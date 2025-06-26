@@ -1,7 +1,8 @@
 
+`timescale 1ns/10ps
 
 module matmul #(
-    parameter N = 256;
+    parameter N = 256,
     parameter M = 256,
     
     parameter J = 256,
@@ -12,8 +13,8 @@ module matmul #(
     input logic reset,
     input logic [N-1:0] mat1 [M-1:0],
     input logic [J-1:0] mat2 [K-1:0],
-    output logic [M-1:0] outmat [J:0]
-    
+    output logic [M-1:0] outmat [J-1:0]
+
 );
 
 
@@ -30,7 +31,6 @@ endmodule
 
 
 module dot_product(
-    input logic []
 
 );
 
