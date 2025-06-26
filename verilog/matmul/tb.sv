@@ -18,7 +18,7 @@ module tb;
     // element_t mat1 [MAX_N-1:0][MAX_M-1:0];
     // element_t mat2 [MAX_J-1:0][MAX_K-1:0];
     element_t mat1 [MAX_N-1:0][MAX_M-1:0];
-    element_t mat2 [11:0][11:0];
+    element_t mat2 [MAX_N-1:0][MAX_M-1:0];
 
     initial begin
         
@@ -26,7 +26,8 @@ module tb;
 
         // Test 0x0 * 0x0 matmul
         $display("\nTesting 0x0 * 0x0 MATMUL: ");
-        generate_mat(12,19, mat1);
+        generate_mat(5,17, mat1);
+        generate_mat(17,9, mat2);
 
         //matmul #(.N(0), .M(0), .J(0), .K(0)) dutZEROS ();
 
@@ -63,19 +64,20 @@ module tb;
     (input int n,m, ref element_t mat[MAX_N-1:0][MAX_M-1:0]);
         for (int i = 0; i < n; i++) begin
             for (int j = 0; j < m; j++) begin
-                mat[i][j] = element_t'($urandom_range(0,3));
+                mat[i][j] = element_t'($urandom_range(0,9));
             end
         end
 
         $display("\n=== mat1 (%0dx%0d) ===", m, n);
-        for (int i = 0; i < m; i++) begin
-            for (int j = 0; j < n; j++) begin
-            $write(" %0d ", mat1[i][j]);
+        for (int i = 0; i < n; i++) begin
+            for (int j = 0; j < m; j++) begin
+            $write(" %0d ", mat[i][j]);
             end
             $display("");   // newline at end of row
         end
-
     endfunction
+
+    // Compute the reference (correct )
 
 
 endmodule 
