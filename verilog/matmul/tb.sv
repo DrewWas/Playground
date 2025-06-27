@@ -5,14 +5,15 @@
 module tb;
 
     parameter DATA_WIDTH = 16;
-    parameter MAX_N=256, MAX_M=256, MAX_J=256, MAX_K=256;
+    parameter MAX_N=32, MAX_M=32, MAX_J=32, MAX_K=32;
     typedef logic signed [DATA_WIDTH-1:0] element_t;
     logic clk, reset;
     // For PRNG (FIGURE THIS OUT!!)... Matrices are NOT updating
     initial void'($urandom(32'hDEADBEEF));
+    int rows, cols, cols2;
 
     // For each test
-    // 1. Generate two random matrices and compute thier matmul
+    // 1. Generate two random matrices and compute their matmul
     // 2. Run those two random matrices through matmul.sv
     // 3. Compare matmul.sv output and generated output
 
@@ -26,32 +27,91 @@ module tb;
         // Initialize
 
         // Test 0x0 * 0x0 matmul
+        rows = 0;
+        cols = 0;
+        cols2 = 0;
         $display("\nTesting 0x0 * 0x0 MATMUL: ");
-        generate_mat(6,5, mat1);
-        generate_mat(5,3, mat2);
-        $display("\n\n"); // Delete in a sec
-        reference_matrix(6,5,3, mat1, mat2, outmat);
+        generate_mat(rows,cols, mat1);
+        generate_mat(cols,cols2, mat2);
+        $display("\n"); // Delete in a sec
+        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
+        // run DUT with inputs 
+        // assert 
 
         // Test 1x1 * 1x1 matmul
-        $display("\nTesting 1x1 * 1x1 MATMUL: ");
+        rows = 1;
+        cols = 1;
+        cols2 = 1;
+        $display("Testing 1x1 * 1x1 MATMUL: ");
+        generate_mat(rows,cols, mat1);
+        generate_mat(cols,cols2, mat2);
+        $display("\n"); // Delete in a sec
+        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
 
 
         // Test 2x2 * 2x2 matmul
+        rows = 2;
+        cols = 2;
+        cols2 = 2;
+        $display("Testing 2x2 * 2x2 MATMUL: ");
+        generate_mat(rows,cols, mat1);
+        generate_mat(cols,cols2, mat2);
+        $display("\n"); // Delete in a sec
+        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
 
-        // Test 256x256 * 256x256 matmul
+        // Test 32x32 * 32x32 matmul
+        rows = 32;
+        cols = 32;
+        cols2 = 32;
+        $display("Testing 256x256 * 256x256 MATMUL: ");
+        generate_mat(rows,cols, mat1);
+        generate_mat(cols,cols2, mat2);
+        $display("\n"); // Delete in a sec
+        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
 
-        // Test 256*128 * 128x256 matmul
+        // Test 32x16 * 16x32 matmul
+        rows = 32;
+        cols = 16;
+        cols2 = 32;
+        $display("Testing 256x128 * 128x256 MATMUL: ");
+        generate_mat(rows,cols, mat1);
+        generate_mat(cols,cols2, mat2);
+        $display("\n"); // Delete in a sec
+        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
 
-        // Test 128x256 * 256x128 matmul
+        // Test 16x32 * 32x16 matmul
+        rows = 16;
+        cols = 32;
+        cols2 = 16;
+        $display("Testing 128x256 * 256x128 MATMUL: ");
+        generate_mat(rows,cols, mat1);
+        generate_mat(cols,cols2, mat2);
+        $display("\n"); // Delete in a sec
+        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
 
-        // Test 100x100 * 50x50 matmul (should error)
+        // Test 10x10 * 5x5 matmul (should error)
+        rows = 10;
+        cols = 10;
+        cols2 = 5;
+        $display("Testing 100x100 * 50x50 MATMUL (should error): ");
+        generate_mat(rows,cols, mat1);
+        generate_mat(cols,cols2, mat2);
+        $display("\n"); // Delete in a sec
+        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
 
-        // Test 256x100 * 256x100 matmul (should error)
-
-        // Test 256x256 identity * 256x256 matmul
+        // Test 32x16 * 32x16 matmul (should error)
+        rows = 32;
+        cols = 16;
+        cols2 = 32;
+        $display("Testing 256x100 * 256x100 MATMUL (should error): ");
+        generate_mat(rows,cols, mat1);
+        generate_mat(cols,cols2, mat2);
+        $display("\n"); // Delete in a sec
+        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
 
 
         // Final asserts and messages
+
 
 
         $finish;
@@ -65,29 +125,24 @@ module tb;
     (input int n,m, ref element_t mat[MAX_N-1:0][MAX_M-1:0]);
         for (int i = 0; i < n; i++) begin
             for (int j = 0; j < m; j++) begin
-                mat[i][j] = element_t'($urandom_range(0,3));
+                mat[i][j] = element_t'($urandom_range(0,3)); // THIS IS WHY NOT RANDOM
             end
         end
 
-        $display("\n=== Input Matrix (%0dx%0d) ===", n, m);
-        for (int i = 0; i < n; i++) begin
-            for (int j = 0; j < m; j++) begin
-                $write(" %0d ", mat[i][j]);
-            end
-            $display("");   // newline at end of row
-        end
+        print_matrix("Input Matrix", n, m, mat);
+
     endfunction
 
     // Compute the reference matrix 
     function automatic void reference_matrix
     (input int n, m, q,
     input element_t mat1 [MAX_N-1:0][MAX_M-1:0], 
-     input element_t mat2 [MAX_J-1:0][MAX_K-1:0], 
-     ref element_t mat[MAX_N-1:0][MAX_M-1:0]);
+    input element_t mat2 [MAX_J-1:0][MAX_K-1:0], 
+    ref element_t mat[MAX_N-1:0][MAX_M-1:0]);
 
-    // n = rows1
-    // m = cols1/rows2
-    // q = cols2
+        // n = rows1
+        // m = cols1/rows2
+        // q = cols2
 
         for (int i = 0; i < n; i++) begin
             for (int j = 0; j < q; j++) begin
@@ -99,15 +154,41 @@ module tb;
             end
         end
 
-        $display("\n=== Output Matrix (%0dx%0d) ===", n, q);
-        for (int i = 0; i < n; i++) begin
-            for (int j = 0; j < q; j++) begin
-            $write(" %0d ", mat[i][j]);
-            end
-            $display("");   // newline at end of row
-        end
+        print_matrix("Output Matrix", n, q, mat);
 
     endfunction
+
+    // Helper task to print the matrices. Shamelessly copied from chat
+    task automatic print_matrix
+    (input string        title,
+    input int           rows, cols,
+    input element_t     mat [MAX_N-1:0][MAX_M-1:0] );
+
+        int LIM = 5;  
+
+        $display("\n=== %s (%0dx%0d) ===", title, rows, cols);
+
+        // rows
+        for (int i = 0; i < rows; i++) begin
+            if (i == LIM && rows > LIM) begin 
+            $display(" ...    ");  
+            i = rows - 5; // jump to last 26th
+            continue;
+            end
+
+            // cols
+            for (int j = 0; j < cols; j++) begin
+            if (j == LIM && cols > LIM) begin
+                $write(" ...");  // col spacer
+                j = cols - 5;
+                continue;
+            end
+            $write(" %0d", mat[i][j]);
+            end
+            $display("");
+        end
+    endtask
+
 
 
 endmodule 

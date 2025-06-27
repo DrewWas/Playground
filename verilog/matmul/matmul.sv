@@ -3,18 +3,18 @@
 
 module matmul #(
     parameter DATA_WIDTH=16,
-    parameter N = 256, 
-    parameter M = 256,
+    parameter MAX_N = 32, 
+    parameter MAX_M = 32,
     
-    parameter J = 256,
-    parameter K = 256
+    parameter MAX_J = 32,
+    parameter MAX_K = 32
 ) (
 
     input logic clk,
     input logic reset,
-    input logic signed [DATA_WIDTH-1:0] mat1 [N-1:0][M-1:0],
-    input logic signed [DATA_WIDTH-1:0] mat2 [J-1:0][K-1:0],
-    output logic signed [DATA_WIDTH-1:0] outmat [M-1:0][J-1:0]
+    input logic signed [DATA_WIDTH-1:0] mat1 [MAX_N-1:0][MAX_M-1:0],
+    input logic signed [DATA_WIDTH-1:0] mat2 [MAX_J-1:0][MAX_K-1:0],
+    output logic signed [DATA_WIDTH-1:0] outmat [MAX_M-1:0][MAX_J-1:0]
 
 );
 
@@ -32,8 +32,12 @@ endmodule
 
 
 module dot_product(
-
+    input logic [DATA_WIDTH-1:0] vectorA [MAX_N-1:0],
+    input logic [DATA_WIDTH-1:0] vectorB [MAX_M-1:0],
+    output logic [DATA_WIDTH-1:0] outval
 );
+
+
 
 
 
