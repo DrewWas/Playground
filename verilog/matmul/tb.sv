@@ -1,6 +1,5 @@
 
 `timescale 1ns/10ps
-//import testing_packages::*;
 
 module tb;
 
