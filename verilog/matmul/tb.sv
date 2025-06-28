@@ -10,6 +10,7 @@ module tb;
     // For PRNG (FIGURE THIS OUT!!)... Matrices are NOT updating
     initial void'($urandom(32'hDEADBEEF));
     int rows, cols, cols2;
+    int test_number;
 
     // For each test
     // 1. Generate two random matrices and compute their matmul
@@ -20,6 +21,7 @@ module tb;
     mat_elem mat1 [M-1:0][M-1:0];
     mat_elem mat2 [M-1:0][M-1:0];
     mat_elem outmat [M-1:0][M-1:0];
+    mat_elem refmat [M-1:0][M-1:0];
 
     matmul matmul (
         .clk(clk), 
@@ -29,123 +31,105 @@ module tb;
         .outmat(outmat)
         );
 
+    localparam RUN_LATENCY = M          // load 32 words
+                          + $clog2(M)+3 // dot_product pipeline
+                          + M*M;     // worst-case STORE loops
+
+
     initial begin
         
         // Initialize
+        $display("RUN LATENCY: %0d", RUN_LATENCY);
+        rows = 32; cols = 32; cols2 = 32;
 
         // Test 0x0 * 0x0 matmul
-        rows = 32;
-        cols = 32;
-        cols2 = 32;
+        test_number = 1;
         $display("\nTest 1: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
-        $display("\n"); // Delete in a sec
-        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
-        // run DUT with inputs 
-        reset = 1;
-        #10
-        reset = 0;
-        print_matrix("REFERENCE MATRIX", M, M, outmat);
-        // assert 
+        reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
+        reset = 1; #10; reset = 0;
+        repeat(100000) @(posedge clk);
+        print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
+        compare_matrices(outmat, refmat, test_number);
 
         // Test 32x32 * 32x32 matmul
-        rows = 32;
-        cols = 32;
-        cols2 = 32;
+        test_number = 2;
         $display("Test 2: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
-        $display("\n"); // Delete in a sec
-        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
-        reset = 1;
-        #10
-        reset = 0;
-        print_matrix("REFERENCE MATRIX", M, M, outmat);
+        reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
+        reset = 1; #10; reset = 0;
+        repeat(100000) @(posedge clk);
+        print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
+        compare_matrices(outmat, refmat, test_number);
 
         // Test 2x2 * 2x2 matmul
-        rows = 32;
-        cols = 32;
-        cols2 = 32;
+        test_number = 2;
         $display("Test 3: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
-        $display("\n"); // Delete in a sec
-        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
-        reset = 1;
-        #10
-        reset = 0;
-        print_matrix("REFERENCE MATRIX", M, M, outmat);
+        reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
+        reset = 1; #10; reset = 0;
+        repeat(100000) @(posedge clk);
+        print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
+        compare_matrices(outmat, refmat, test_number);
 
         // Test 32x32 * 32x32 matmul
-        rows = 32;
-        cols = 32;
-        cols2 = 32;
+        test_number = 3;
+
         $display("Test 5: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
-        $display("\n"); // Delete in a sec
-        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
-        reset = 1;
-        #10
-        reset = 0;
-        print_matrix("REFERENCE MATRIX", M, M, outmat);
+        reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
+        reset = 1; #10; reset = 0;
+        repeat(100000) @(posedge clk);
+        print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
+        compare_matrices(outmat, refmat, test_number);
 
         // Test 32x16 * 16x32 matmul
-        rows = 32;
-        cols = 32;
-        cols2 = 32;
+        test_number = 4;
         $display("Test 6: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
-        $display("\n"); // Delete in a sec
-        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
-        reset = 1;
-        #10
-        reset = 0;
-        print_matrix("REFERENCE MATRIX", M, M, outmat);
+        reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
+        reset = 1; #10; reset = 0;
+        repeat(100000) @(posedge clk);
+        print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
+        compare_matrices(outmat, refmat, test_number);
 
         // Test 16x32 * 32x16 matmul
-        rows = 32;
-        cols = 32;
-        cols2 = 32;
+        test_number = 5;
         $display("Test 7: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
-        $display("\n"); // Delete in a sec
-        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
-        reset = 1;
-        #10
-        reset = 0;
-        print_matrix("REFERENCE MATRIX", M, M, outmat);
+        reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
+        reset = 1; #10; reset = 0;
+        repeat(100000) @(posedge clk);
+        print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
+        compare_matrices(outmat, refmat, test_number);
 
         // Test 13x17 * 17x19 matmul (odd rows and cols)
-        rows = 32;
-        cols = 32;
-        cols2 = 32;
+        test_number = 6;
         $display("Test 8: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
-        $display("\n"); // Delete in a sec
-        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
-        reset = 1;
-        #10
-        reset = 0;
-        print_matrix("REFERENCE MATRIX", M, M, outmat);
+        reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
+        reset = 1; #10; reset = 0;
+        repeat(100000) @(posedge clk);
+        print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
+        compare_matrices(outmat, refmat, test_number);
 
         // Test 32x16 * 32x16 matmul (should error)
-        rows = 32;
-        cols = 32;
-        cols2 = 32;
+        test_number = 7;
         $display("Test 9: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
-        $display("\n"); // Delete in a sec
-        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
-        reset = 1;
-        #10
-        reset = 0;
-        print_matrix("REFERENCE MATRIX", M, M, outmat);
+        reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
+        reset = 1; #10; reset = 0;
+        repeat(100000) @(posedge clk);
+        print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
+        compare_matrices(outmat, refmat, test_number);
 
 
         // Final asserts and messages
@@ -155,6 +139,20 @@ module tb;
         $finish;
     end
 
+
+    function automatic void compare_matrices
+    (ref mat_elem original_mat[M-1:0][M-1:0],
+    ref mat_elem testing_mat[M-1:0][M-1:0],
+    int test_number
+    );
+        for (int i = 0; i < M; i++) begin
+            for (int j = 0; j < M; j++) begin
+                if (original_mat[i][j] != testing_mat[i][j])
+                $fatal("Test #%0d failed!", test_number);
+            end
+        end
+        $display("Both Matrices equal! | TEST PASSED!");
+    endfunction
 
 
 
@@ -205,6 +203,7 @@ module tb;
     input mat_elem     mat [M-1:0][M-1:0] );
 
         int LIM = 5;  
+        //int LIM = 32;
 
         $display("\n=== %s (%0dx%0d) ===", title, rows, cols);
 
@@ -233,6 +232,5 @@ module tb;
 
 endmodule 
 
-// FIGURE OUT WHY SYNTHESIS TAKES SO FUCKING LONG!!!!
 
 
