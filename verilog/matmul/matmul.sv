@@ -10,20 +10,21 @@ module matmul #(
 
     input logic clk,
     input logic reset,
-    input logic signed [DATA_WIDTH-1:0] mat1 [N-1:0][M-1:0],
-    input logic signed [DATA_WIDTH-1:0] mat2 [M-1:0][Q-1:0],
+    input logic signed [(2 * DATA_WIDTH) + $clog2(M) - 1:0] mat1 [N-1:0][M-1:0],
+    input logic signed [(2 * DATA_WIDTH) + $clog2(M) - 1:0] mat2 [M-1:0][Q-1:0],
     output logic signed [(2 * DATA_WIDTH) + $clog2(M) - 1:0] outmat [N-1:0][Q-1:0]
 
 );
+    typedef logic signed [(2 * DATA_WIDTH) + $clog2(M) - 1:0] mat_elem; 
 
     // Staging buffers (buffer one mat1 row and one mat2 col)
-    logic signed [DATA_WIDTH - 1 : 0] staging_rows [M - 1 : 0];
-    logic signed [DATA_WIDTH - 1 : 0] staging_cols [M - 1 : 0];
+    mat_elem staging_rows [M - 1 : 0]; // Switch back maybe 
+    mat_elem staging_cols [M - 1 : 0];
 
     // Control flow logic 
     localparam IDLE=2'd0, LOAD=2'd1, RUN=2'd2, STORE=2'd3;
     logic [1:0] state;
-    int row, col;
+    int row, col, k;
     logic dp_start, dp_done;
     logic signed [(2 * DATA_WIDTH) + $clog2(M) - 1:0] dp_result;
 
@@ -36,17 +37,67 @@ module matmul #(
         .clk(clk),
         .reset(reset),
         .valid_in(dp_start),
-        .vectorA(staging_rows[row]), // See if you have to index
-        .vectorB(staging_cols[col])  // See if you have to index
+        .vectorA(staging_rows), // See if you have to index
+        .vectorB(staging_cols),  // See if you have to index
         .valid_out(dp_done),
         .outval(dp_result)
     );
 
 
     // FSM sequence
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            state <= IDLE;
+            row <= '0;
+            col <= 0;
+            k <= 0;
+        end else begin
+            dp_start <= 1'b0;
+            case (state)    
 
+                IDLE : begin
+                    row <= 0; col <= 0; k <= 0;
+                    state <= LOAD;
+                end
 
-    //assign outmat = 16'd0;
+                LOAD : begin
+                    staging_rows[k] <= mat1[row][k];
+                    staging_cols[k] <= mat2[k][col];
+                    k <= k + 1;
+                    if (k == M - 1) begin
+                        k <= 0;
+                        dp_start <= 1'b1;
+                        state <= RUN;
+                    end
+                end
+
+                RUN : begin
+                    if (dp_done) begin
+                        state <= STORE;
+                    end
+                end
+
+                STORE : begin
+                    outmat[row][col] <= dp_result;
+
+                    // advance matrix coords
+                    if (col == Q - 1) begin
+                        col <= 0;
+                        if (row == N - 1) begin
+                            state <= IDLE;
+                        end else begin
+                            row <= row + 1;
+                            state <= LOAD;
+                        end
+                    end else begin
+                        col <= col + 1;
+                        state <= LOAD;
+                    end
+                end
+
+            endcase
+        end
+    end
 
 endmodule
 
@@ -64,14 +115,14 @@ module dot_product #(
     input clk, 
     input reset,
     input logic valid_in,
-    input logic [DATA_WIDTH-1:0] vectorA [MAX_N-1:0],
-    input logic [DATA_WIDTH-1:0] vectorB [MAX_N-1:0],
+    input logic [(2 * DATA_WIDTH) + $clog2(M) - 1:0] vectorA [M-1:0],
+    input logic [(2 * DATA_WIDTH) + $clog2(M) - 1:0] vectorB [M-1:0],
     output logic valid_out,
-    output logic [(DATA_WIDTH * 2) + $clog2(MAX_N) - 1:0] outval
+    output logic [(DATA_WIDTH * 2) + $clog2(M) - 1:0] outval
 );
 
 
-    logic [(DATA_WIDTH * 2) - 1 : 0] prods [M-1:0];
+    logic [(2 * DATA_WIDTH) + $clog2(M) - 1:0] prods [M-1:0];
     logic val0, val1, val2, val3;
 
     always_comb begin
@@ -88,7 +139,7 @@ module dot_product #(
     // ------- COLLAPSE THIS INTO ONE GENERATE STATEMENT ---------------
     always_ff @(posedge clk) begin
         if (reset) begin
-            sums0 <= '0;
+            sums0 <= '{default:'0};
             val0 <= 1'b0;
         end else begin
             for (int i = 0; i < M / 2; i++) begin
@@ -102,7 +153,7 @@ module dot_product #(
     logic signed [SUM_WIDTH - 1:0] sums1 [M / 4];
     always_ff @(posedge clk) begin
         if (reset) begin
-            sums1 <= '0;
+            sums1 <= '{default:'0};
             val1 <= 1'b0;
         end else begin
             for (int i = 0; i < M / 4; i++) begin
@@ -117,7 +168,7 @@ module dot_product #(
     logic signed [SUM_WIDTH - 1:0] sums2 [M / 8];
     always_ff @(posedge clk) begin
         if (reset) begin
-            sums2 <= '0;
+            sums2 <= '{default:'0};
             val2 <= 1'b0;
         end else begin
             for (int i = 0; i < M / 8; i++) begin
@@ -131,7 +182,7 @@ module dot_product #(
     logic signed [SUM_WIDTH - 1:0] sums3 [M / 16];
     always_ff @(posedge clk) begin
         if (reset) begin
-            sums3 <= '0;
+            sums3 <= '{default:'0};
             val3 <= 1'b0;
         end else begin
             for (int i = 0; i < M / 16; i++) begin

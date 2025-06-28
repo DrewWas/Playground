@@ -5,7 +5,7 @@ module tb;
 
     parameter DATA_WIDTH = 16;
     parameter M = 32;
-    typedef logic signed [DATA_WIDTH-1:0] element_t;
+    typedef logic signed [(2 * DATA_WIDTH) + $clog2(M) - 1:0] mat_elem;
     logic clk, reset;
     // For PRNG (FIGURE THIS OUT!!)... Matrices are NOT updating
     initial void'($urandom(32'hDEADBEEF));
@@ -17,9 +17,17 @@ module tb;
     // 3. Compare matmul.sv output and generated output
 
     always #5 clk = ~clk;
-    element_t mat1 [M-1:0][M-1:0];
-    element_t mat2 [M-1:0][M-1:0];
-    element_t outmat [M-1:0][M-1:0];
+    mat_elem mat1 [M-1:0][M-1:0];
+    mat_elem mat2 [M-1:0][M-1:0];
+    mat_elem outmat [M-1:0][M-1:0];
+
+    matmul matmul (
+        .clk(clk), 
+        .reset(reset), 
+        .mat1(mat1), 
+        .mat2(mat2), 
+        .outmat(outmat)
+        );
 
     initial begin
         
@@ -29,84 +37,115 @@ module tb;
         rows = 32;
         cols = 32;
         cols2 = 32;
-        $display("\nTesting 0x0 * 0x0 MATMUL: ");
+        $display("\nTest 1: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
         $display("\n"); // Delete in a sec
         reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
         // run DUT with inputs 
+        reset = 1;
+        #10
+        reset = 0;
+        print_matrix("REFERENCE MATRIX", M, M, outmat);
         // assert 
-
-        // Test 1x1 * 1x1 matmul
-        rows = 32;
-        cols = 32;
-        cols2 = 32;
-        $display("Testing 1x1 * 1x1 MATMUL: ");
-        generate_mat(rows,cols, mat1);
-        generate_mat(cols,cols2, mat2);
-        $display("\n"); // Delete in a sec
-        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
-
-
-        // Test 2x2 * 2x2 matmul
-        rows = 32;
-        cols = 32;
-        cols2 = 32;
-        $display("Testing 2x2 * 2x2 MATMUL: ");
-        generate_mat(rows,cols, mat1);
-        generate_mat(cols,cols2, mat2);
-        $display("\n"); // Delete in a sec
-        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
 
         // Test 32x32 * 32x32 matmul
         rows = 32;
         cols = 32;
         cols2 = 32;
-        $display("Testing 256x256 * 256x256 MATMUL: ");
+        $display("Test 2: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
         $display("\n"); // Delete in a sec
         reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
+        reset = 1;
+        #10
+        reset = 0;
+        print_matrix("REFERENCE MATRIX", M, M, outmat);
+
+        // Test 2x2 * 2x2 matmul
+        rows = 32;
+        cols = 32;
+        cols2 = 32;
+        $display("Test 3: ");
+        generate_mat(rows,cols, mat1);
+        generate_mat(cols,cols2, mat2);
+        $display("\n"); // Delete in a sec
+        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
+        reset = 1;
+        #10
+        reset = 0;
+        print_matrix("REFERENCE MATRIX", M, M, outmat);
+
+        // Test 32x32 * 32x32 matmul
+        rows = 32;
+        cols = 32;
+        cols2 = 32;
+        $display("Test 5: ");
+        generate_mat(rows,cols, mat1);
+        generate_mat(cols,cols2, mat2);
+        $display("\n"); // Delete in a sec
+        reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
+        reset = 1;
+        #10
+        reset = 0;
+        print_matrix("REFERENCE MATRIX", M, M, outmat);
 
         // Test 32x16 * 16x32 matmul
         rows = 32;
         cols = 32;
         cols2 = 32;
-        $display("Testing 256x128 * 128x256 MATMUL: ");
+        $display("Test 6: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
         $display("\n"); // Delete in a sec
         reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
+        reset = 1;
+        #10
+        reset = 0;
+        print_matrix("REFERENCE MATRIX", M, M, outmat);
 
         // Test 16x32 * 32x16 matmul
         rows = 32;
         cols = 32;
         cols2 = 32;
-        $display("Testing 128x256 * 256x128 MATMUL: ");
+        $display("Test 7: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
         $display("\n"); // Delete in a sec
         reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
+        reset = 1;
+        #10
+        reset = 0;
+        print_matrix("REFERENCE MATRIX", M, M, outmat);
 
         // Test 13x17 * 17x19 matmul (odd rows and cols)
         rows = 32;
         cols = 32;
         cols2 = 32;
-        $display("Testing 13x17 * 17x19 MATMUL (should error): ");
+        $display("Test 8: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
         $display("\n"); // Delete in a sec
         reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
+        reset = 1;
+        #10
+        reset = 0;
+        print_matrix("REFERENCE MATRIX", M, M, outmat);
 
         // Test 32x16 * 32x16 matmul (should error)
         rows = 32;
         cols = 32;
         cols2 = 32;
-        $display("Testing 256x100 * 256x100 MATMUL (should error): ");
+        $display("Test 9: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
         $display("\n"); // Delete in a sec
         reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
+        reset = 1;
+        #10
+        reset = 0;
+        print_matrix("REFERENCE MATRIX", M, M, outmat);
 
 
         // Final asserts and messages
@@ -121,10 +160,10 @@ module tb;
 
     // Fill test matrices 
     function automatic void generate_mat 
-    (input int n,m, ref element_t mat[M-1:0][M-1:0]);
+    (input int n,m, ref mat_elem mat[M-1:0][M-1:0]);
         for (int i = 0; i < n; i++) begin
             for (int j = 0; j < m; j++) begin
-                mat[i][j] = element_t'($urandom_range(0,3)); // THIS IS WHY NOT RANDOM
+                mat[i][j] = mat_elem'($urandom_range(0,3)); // THIS IS WHY NOT RANDOM
             end
         end
 
@@ -135,9 +174,9 @@ module tb;
     // Compute the reference matrix 
     function automatic void reference_matrix
     (input int n, m, q,
-    input element_t mat1 [M-1:0][M-1:0], 
-    input element_t mat2 [M-1:0][M-1:0], 
-    ref element_t mat[M-1:0][M-1:0]);
+    input mat_elem mat1 [M-1:0][M-1:0], 
+    input mat_elem mat2 [M-1:0][M-1:0], 
+    ref mat_elem mat[M-1:0][M-1:0]);
 
         // n = rows1
         // m = cols1/rows2
@@ -145,11 +184,11 @@ module tb;
 
         for (int i = 0; i < n; i++) begin
             for (int j = 0; j < q; j++) begin
-                int sum = 0;
+                mat_elem sum = 0;
                 for (int k = 0; k < m; k++) begin
                     sum += mat1[i][k] * mat2[k][j];
                 end
-                mat[i][j] = element_t'(sum);
+                mat[i][j] = mat_elem'(sum);
             end
         end
 
@@ -157,11 +196,13 @@ module tb;
 
     endfunction
 
+
+
     // Helper task to print the matrices. Shamelessly copied from chat
     task automatic print_matrix
     (input string        title,
     input int           rows, cols,
-    input element_t     mat [M-1:0][M-1:0] );
+    input mat_elem     mat [M-1:0][M-1:0] );
 
         int LIM = 5;  
 
