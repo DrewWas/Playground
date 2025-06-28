@@ -4,7 +4,7 @@
 module tb;
 
     parameter DATA_WIDTH = 16;
-    parameter MAX_N=32, MAX_M=32, MAX_J=32, MAX_K=32;
+    parameter M = 32;
     typedef logic signed [DATA_WIDTH-1:0] element_t;
     logic clk, reset;
     // For PRNG (FIGURE THIS OUT!!)... Matrices are NOT updating
@@ -17,18 +17,18 @@ module tb;
     // 3. Compare matmul.sv output and generated output
 
     always #5 clk = ~clk;
-    element_t mat1 [MAX_N-1:0][MAX_M-1:0];
-    element_t mat2 [MAX_J-1:0][MAX_K-1:0];
-    element_t outmat [MAX_M-1:0][MAX_J-1:0];
+    element_t mat1 [M-1:0][M-1:0];
+    element_t mat2 [M-1:0][M-1:0];
+    element_t outmat [M-1:0][M-1:0];
 
     initial begin
         
         // Initialize
 
         // Test 0x0 * 0x0 matmul
-        rows = 0;
-        cols = 0;
-        cols2 = 0;
+        rows = 32;
+        cols = 32;
+        cols2 = 32;
         $display("\nTesting 0x0 * 0x0 MATMUL: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
@@ -38,9 +38,9 @@ module tb;
         // assert 
 
         // Test 1x1 * 1x1 matmul
-        rows = 1;
-        cols = 1;
-        cols2 = 1;
+        rows = 32;
+        cols = 32;
+        cols2 = 32;
         $display("Testing 1x1 * 1x1 MATMUL: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
@@ -49,9 +49,9 @@ module tb;
 
 
         // Test 2x2 * 2x2 matmul
-        rows = 2;
-        cols = 2;
-        cols2 = 2;
+        rows = 32;
+        cols = 32;
+        cols2 = 32;
         $display("Testing 2x2 * 2x2 MATMUL: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
@@ -70,7 +70,7 @@ module tb;
 
         // Test 32x16 * 16x32 matmul
         rows = 32;
-        cols = 16;
+        cols = 32;
         cols2 = 32;
         $display("Testing 256x128 * 128x256 MATMUL: ");
         generate_mat(rows,cols, mat1);
@@ -79,20 +79,20 @@ module tb;
         reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
 
         // Test 16x32 * 32x16 matmul
-        rows = 16;
+        rows = 32;
         cols = 32;
-        cols2 = 16;
+        cols2 = 32;
         $display("Testing 128x256 * 256x128 MATMUL: ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
         $display("\n"); // Delete in a sec
         reference_matrix(rows, cols, cols2, mat1, mat2, outmat);
 
-        // Test 10x10 * 5x5 matmul (should error)
-        rows = 10;
-        cols = 10;
-        cols2 = 5;
-        $display("Testing 100x100 * 50x50 MATMUL (should error): ");
+        // Test 13x17 * 17x19 matmul (odd rows and cols)
+        rows = 32;
+        cols = 32;
+        cols2 = 32;
+        $display("Testing 13x17 * 17x19 MATMUL (should error): ");
         generate_mat(rows,cols, mat1);
         generate_mat(cols,cols2, mat2);
         $display("\n"); // Delete in a sec
@@ -100,7 +100,7 @@ module tb;
 
         // Test 32x16 * 32x16 matmul (should error)
         rows = 32;
-        cols = 16;
+        cols = 32;
         cols2 = 32;
         $display("Testing 256x100 * 256x100 MATMUL (should error): ");
         generate_mat(rows,cols, mat1);
@@ -121,7 +121,7 @@ module tb;
 
     // Fill test matrices 
     function automatic void generate_mat 
-    (input int n,m, ref element_t mat[MAX_N-1:0][MAX_M-1:0]);
+    (input int n,m, ref element_t mat[M-1:0][M-1:0]);
         for (int i = 0; i < n; i++) begin
             for (int j = 0; j < m; j++) begin
                 mat[i][j] = element_t'($urandom_range(0,3)); // THIS IS WHY NOT RANDOM
@@ -135,9 +135,9 @@ module tb;
     // Compute the reference matrix 
     function automatic void reference_matrix
     (input int n, m, q,
-    input element_t mat1 [MAX_N-1:0][MAX_M-1:0], 
-    input element_t mat2 [MAX_J-1:0][MAX_K-1:0], 
-    ref element_t mat[MAX_N-1:0][MAX_M-1:0]);
+    input element_t mat1 [M-1:0][M-1:0], 
+    input element_t mat2 [M-1:0][M-1:0], 
+    ref element_t mat[M-1:0][M-1:0]);
 
         // n = rows1
         // m = cols1/rows2
@@ -161,7 +161,7 @@ module tb;
     task automatic print_matrix
     (input string        title,
     input int           rows, cols,
-    input element_t     mat [MAX_N-1:0][MAX_M-1:0] );
+    input element_t     mat [M-1:0][M-1:0] );
 
         int LIM = 5;  
 
