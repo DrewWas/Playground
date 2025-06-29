@@ -31,15 +31,10 @@ module tb;
         .outmat(outmat)
         );
 
-    localparam RUN_LATENCY = M          // load 32 words
-                          + $clog2(M)+3 // dot_product pipeline
-                          + M*M;     // worst-case STORE loops
-
 
     initial begin
         
         // Initialize
-        $display("RUN LATENCY: %0d", RUN_LATENCY);
         rows = 32; cols = 32; cols2 = 32;
 
         // Test 0x0 * 0x0 matmul
@@ -49,7 +44,7 @@ module tb;
         generate_mat(cols,cols2, mat2);
         reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
         reset = 1; #10; reset = 0;
-        repeat(100000) @(posedge clk);
+        repeat(1250) @(posedge clk);
         print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
         compare_matrices(outmat, refmat, test_number);
 
@@ -60,7 +55,7 @@ module tb;
         generate_mat(cols,cols2, mat2);
         reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
         reset = 1; #10; reset = 0;
-        repeat(100000) @(posedge clk);
+        repeat(39940) @(posedge clk);
         print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
         compare_matrices(outmat, refmat, test_number);
 
@@ -71,7 +66,7 @@ module tb;
         generate_mat(cols,cols2, mat2);
         reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
         reset = 1; #10; reset = 0;
-        repeat(100000) @(posedge clk);
+        repeat(39940) @(posedge clk);
         print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
         compare_matrices(outmat, refmat, test_number);
 
@@ -83,7 +78,7 @@ module tb;
         generate_mat(cols,cols2, mat2);
         reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
         reset = 1; #10; reset = 0;
-        repeat(100000) @(posedge clk);
+        repeat(39940) @(posedge clk);
         print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
         compare_matrices(outmat, refmat, test_number);
 
@@ -94,7 +89,7 @@ module tb;
         generate_mat(cols,cols2, mat2);
         reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
         reset = 1; #10; reset = 0;
-        repeat(100000) @(posedge clk);
+        repeat(39940) @(posedge clk);
         print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
         compare_matrices(outmat, refmat, test_number);
 
@@ -105,7 +100,7 @@ module tb;
         generate_mat(cols,cols2, mat2);
         reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
         reset = 1; #10; reset = 0;
-        repeat(100000) @(posedge clk);
+        repeat(39940) @(posedge clk);
         print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
         compare_matrices(outmat, refmat, test_number);
 
@@ -116,7 +111,7 @@ module tb;
         generate_mat(cols,cols2, mat2);
         reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
         reset = 1; #10; reset = 0;
-        repeat(100000) @(posedge clk);
+        repeat(39940) @(posedge clk);
         print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
         compare_matrices(outmat, refmat, test_number);
 
@@ -127,7 +122,7 @@ module tb;
         generate_mat(cols,cols2, mat2);
         reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
         reset = 1; #10; reset = 0;
-        repeat(100000) @(posedge clk);
+        repeat(39940) @(posedge clk);
         print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
         compare_matrices(outmat, refmat, test_number);
 

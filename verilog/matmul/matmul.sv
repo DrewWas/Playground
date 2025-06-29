@@ -17,40 +17,53 @@ module matmul #(
 );
     typedef logic signed [(2 * DATA_WIDTH) + $clog2(M) - 1:0] mat_elem; 
 
-    // Staging buffers (buffer one mat1 row and one mat2 col)
-    mat_elem staging_rows [M - 1 : 0]; // Switch back maybe 
-    mat_elem staging_cols [M - 1 : 0];
 
     // Control flow logic 
     localparam IDLE=2'd0, LOAD=2'd1, RUN=2'd2, STORE=2'd3;
+    localparam num_dps = 32;
     logic [1:0] state;
     int row, col, k;
-    logic dp_start, dp_done;
-    logic signed [(2 * DATA_WIDTH) + $clog2(M) - 1:0] dp_result;
+    logic dp_start;
+    logic [num_dps-1:0] dp_done;
+    logic signed [(2 * DATA_WIDTH) + $clog2(M) - 1:0] dp_result [num_dps-1:0];
+    logic all_done;
 
-    // Dot product instnace 
-    dot_product #(
-        .DATA_WIDTH(DATA_WIDTH),
-        .M(M)
+    assign all_done = &dp_done;
 
-    ) compute (
-        .clk(clk),
-        .reset(reset),
-        .valid_in(dp_start),
-        .vectorA(staging_rows), // See if you have to index
-        .vectorB(staging_cols),  // See if you have to index
-        .valid_out(dp_done),
-        .outval(dp_result)
-    );
+    // Staging buffers (buffer one mat1 row and one mat2 col)
+    mat_elem staging_rows [M - 1 : 0]; // Switch back maybe 
+    mat_elem staging_cols [num_dps-1:0][M - 1 : 0];
+
+    // Dot product instances
+    genvar g;
+    generate;
+        for (g = 0; g < num_dps; g++) begin : PE 
+            dot_product #(
+            .DATA_WIDTH(DATA_WIDTH),
+            .M(M)
+
+            ) compute (
+                .clk(clk),
+                .reset(reset),
+                .valid_in(dp_start),
+                .vectorA(staging_rows), // See if you have to index
+                .vectorB(staging_cols[g]),  // See if you have to index
+                .valid_out(dp_done[g]),
+                .outval(dp_result[g])
+            );
+        end
+    endgenerate
 
 
     // FSM sequence
+    int i;
     always_ff @(posedge clk) begin
         if (reset) begin
             state <= IDLE;
             row <= '0;
             col <= 0;
             k <= 0;
+            i <= 0;
         end else begin
             dp_start <= 1'b0;
             case (state)    
@@ -62,7 +75,11 @@ module matmul #(
 
                 LOAD : begin
                     staging_rows[k] <= mat1[row][k];
-                    staging_cols[k] <= mat2[k][col];
+                    for (int pe = 0; pe < num_dps; pe++) begin
+                        if (col + pe < Q) begin
+                            staging_cols[pe][k] <= mat2[k][col + pe];
+                        end
+                    end
                     k <= k + 1;
                     if (k == M - 1) begin
                         k <= 0;
@@ -72,16 +89,19 @@ module matmul #(
                 end
 
                 RUN : begin
-                    if (dp_done) begin
+                    if (all_done) begin
                         state <= STORE;
                     end
                 end
 
                 STORE : begin
-                    outmat[row][col] <= dp_result;
+                    for (int pe = 0; pe < num_dps; pe++) begin
+                        if (col + pe < Q) begin
+                            outmat[row][col + pe] <= dp_result[pe];
+                        end
+                    end
 
-                    // advance matrix coords
-                    if (col == Q - 1) begin
+                    if (col + num_dps >= Q) begin
                         col <= 0;
                         if (row == N - 1) begin
                             state <= IDLE;
@@ -90,7 +110,7 @@ module matmul #(
                             state <= LOAD;
                         end
                     end else begin
-                        col <= col + 1;
+                        col <= col + num_dps;
                         state <= LOAD;
                     end
                 end
