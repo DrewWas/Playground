@@ -55,7 +55,7 @@ module tb;
         generate_mat(cols,cols2, mat2);
         reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
         reset = 1; #10; reset = 0;
-        repeat(39940) @(posedge clk);
+        repeat(1250) @(posedge clk);
         print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
         compare_matrices(outmat, refmat, test_number);
 
@@ -66,7 +66,7 @@ module tb;
         generate_mat(cols,cols2, mat2);
         reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
         reset = 1; #10; reset = 0;
-        repeat(39940) @(posedge clk);
+        repeat(1250) @(posedge clk);
         print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
         compare_matrices(outmat, refmat, test_number);
 
@@ -78,7 +78,7 @@ module tb;
         generate_mat(cols,cols2, mat2);
         reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
         reset = 1; #10; reset = 0;
-        repeat(39940) @(posedge clk);
+        repeat(1250) @(posedge clk);
         print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
         compare_matrices(outmat, refmat, test_number);
 
@@ -89,7 +89,7 @@ module tb;
         generate_mat(cols,cols2, mat2);
         reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
         reset = 1; #10; reset = 0;
-        repeat(39940) @(posedge clk);
+        repeat(1250) @(posedge clk);
         print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
         compare_matrices(outmat, refmat, test_number);
 
@@ -100,7 +100,7 @@ module tb;
         generate_mat(cols,cols2, mat2);
         reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
         reset = 1; #10; reset = 0;
-        repeat(39940) @(posedge clk);
+        repeat(1250) @(posedge clk);
         print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
         compare_matrices(outmat, refmat, test_number);
 
@@ -122,14 +122,12 @@ module tb;
         generate_mat(cols,cols2, mat2);
         reference_matrix(rows, cols, cols2, mat1, mat2, refmat);
         reset = 1; #10; reset = 0;
-        repeat(39940) @(posedge clk);
+        repeat(1250) @(posedge clk);
         print_matrix("MODULE OUTPUT MATRIX", M, M, outmat);
         compare_matrices(outmat, refmat, test_number);
 
 
         // Final asserts and messages
-
-
 
         $finish;
     end
@@ -138,8 +136,7 @@ module tb;
     function automatic void compare_matrices
     (ref mat_elem original_mat[M-1:0][M-1:0],
     ref mat_elem testing_mat[M-1:0][M-1:0],
-    int test_number
-    );
+    int test_number);
         for (int i = 0; i < M; i++) begin
             for (int j = 0; j < M; j++) begin
                 if (original_mat[i][j] != testing_mat[i][j])

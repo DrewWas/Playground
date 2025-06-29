@@ -31,8 +31,8 @@ module matmul #(
     assign all_done = &dp_done;
 
     // Staging buffers (buffer one mat1 row and one mat2 col)
-    mat_elem staging_rows [M - 1 : 0]; // Switch back maybe 
-    mat_elem staging_cols [num_dps-1:0][M - 1 : 0];
+    mat_elem staging_rows [M-1:0]; 
+    mat_elem staging_cols [num_dps-1:0][M-1:0];
 
     // Dot product instances
     genvar g;
@@ -46,8 +46,8 @@ module matmul #(
                 .clk(clk),
                 .reset(reset),
                 .valid_in(dp_start),
-                .vectorA(staging_rows), // See if you have to index
-                .vectorB(staging_cols[g]),  // See if you have to index
+                .vectorA(staging_rows), 
+                .vectorB(staging_cols[g]),  
                 .valid_out(dp_done[g]),
                 .outval(dp_result[g])
             );
@@ -76,9 +76,7 @@ module matmul #(
                 LOAD : begin
                     staging_rows[k] <= mat1[row][k];
                     for (int pe = 0; pe < num_dps; pe++) begin
-                        if (col + pe < Q) begin
-                            staging_cols[pe][k] <= mat2[k][col + pe];
-                        end
+                        staging_cols[pe][k] <= mat2[k][pe];
                     end
                     k <= k + 1;
                     if (k == M - 1) begin
@@ -96,9 +94,7 @@ module matmul #(
 
                 STORE : begin
                     for (int pe = 0; pe < num_dps; pe++) begin
-                        if (col + pe < Q) begin
-                            outmat[row][col + pe] <= dp_result[pe];
-                        end
+                        outmat[row][pe] <= dp_result[pe];
                     end
 
                     if (col + num_dps >= Q) begin
