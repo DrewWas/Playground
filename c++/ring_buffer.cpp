@@ -7,7 +7,7 @@
 class RingBuffer {
    
     private: 
-        // Buffer can store 64 bytes
+        // Buffer can store 64 elements each of 16 bits (128 bytes total) 
         static constexpr size_t CAPACITY = 64;
 
         // Buffer + Buffer variables 
@@ -16,26 +16,32 @@ class RingBuffer {
         size_t read_pntr   = 0;
         size_t buffer_size = 0;
 
-
     public:
         // No need for an index because ring buffers are FIFOs
         bool write_to_buffer(int16_t data) {
-            // Return if write was successful
-            buffer[write_pntr] = data;
-            write_pntr += 1;
-            buffer_size += 1;
+            // Buffer full
+            if (buffer_size > CAPACITY) {
+                std::cout << "Buffer full!\n";
+            } else { 
+                // Return if write was successful
+                buffer[write_pntr] = data;
+                write_pntr = (write_pntr + 1) % CAPACITY;
+                buffer_size += 1;
 
-            return buffer_size < CAPACITY;
+                return true; 
+            }
+
+            return false;
         }
 
         int16_t read_from_buffer() {
             // Return if read was successful
-            std::cout << buffer[read_pntr];
+            int16_t output = buffer[read_pntr];
+            std::cout << output; 
             std::cout << "\n";
-            read_pntr += 1;
+            read_pntr = (read_pntr + 1) % CAPACITY;
 
-
-            return 0; 
+            return output; 
         }
 
         void clear_buffer() {
